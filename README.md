@@ -27,3 +27,23 @@ src: https://azure.microsoft.com/en-us/resources/cloud-computing-dictionary/what
       - If the load does not reduce, then the autoscale rule will continue to scale-out the vmss instances
       - When the load reduces, the autoscale rule should be able to scale the instances back in. This will stop when the metric is well within the limits of what can be handled by the on-premise infrastructure
 - Azure load testing tool needs to be used to exercise this scenario. Load pattern needs to be set in such a way that the burst happens to the cloud, continues to scale the scale-set beyond the first iteration and then slowly drop. At the end of the test, the traffic should be maintained at 80-90% of the Peak that on-premise can handle
+
+## Design Considerations
+1. The virtual machine scale sets deployed in region#1 will not have auto-scale configured. This mimics the on-premise environment where the infrastructure cannot be scaled out and that would be the main reason why a burst to cloud is considered
+2. A **Baselining process** needs to be done to understand the peak performance of the 3 instance scale set deployed in region#1
+   - The baselining process would help us understand 
+     - The number of HTTP(s) requests/second that the on-prem set up can handle. The variables that need to be taken into account include  
+       - The capacity of the virtual machines- General purpose machines from the D-series VMs should be sufficient for this setup
+       - What is considered as the peak - From the metrics that appinsights provides, performanceCounters/requestExecutionTime (or) performanceCounters/requestExecutionTime should be the metric of interest. Based on the load test, if the performanceCounters/requestExecutionTime exceeds an assumed threshold of 1 second (or) performanceCounters/requestExecutionTime exceeds an assumed threshold of 2-3 per second, then the stamp set to be peaking its capacity. The request count in the load testing tool when this peaking happens indicates the point at which the on-premise set up would be just short of saturation. **Note:** if the assumed thresholds indicate 80% of the peaking point, then that would help in saving the stamp and bursting to the cloud before the stamp goes down
+     - The load testing setup at the end of the baselining process gets us the number of execution engines required when the Virtual users (VUs) per engine instance is set to 250 i.e. in the JMX script file
+3. Region#2 will have just 1 instance in the scaleset depicting an Active Cold-StandBy setup for high availability
+4. An external load balancer with an Azure provided DNS label has to be deployed in each of the 2 regions that will serve as the entry point for the regional traffic. 
+5. Traffic manager has to be configured with just 2 endpoints that correspond to the stamps in the 2 regions, one representing the on-premise environment and the other representing the azure environment
+6. Azure monitor autoscale rule has to be configured as follows
+   - Rule: performanceCounters/requestExecutionTime > 1 second (threshold) for 2 minutes then 
+     - *Scale out rule*: Increase the instance count by 2 (this would get this stamp to a state that is similar to stamp#1 i.e. 3 instances to handle the traffic)
+     - b) *Automation Trigger rule*: change the weights of the traffic manager endpoints to 85 and 15 when scaleout operation is triggered and back to 100(stamp#1) and 0(stamp#2) when the scale-in operation is triggered 
+     - c) *Cool down period*: the time that the autoscale engine needs to wait after the previous scaleout operation completed before scaling out again. This can be set to 3 minutes? 
+     - d) *Scale in rule* : performanceCounters/requestExecutionTime < 900 ms
+
+   
