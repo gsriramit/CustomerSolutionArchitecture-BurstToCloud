@@ -47,3 +47,10 @@ src: https://azure.microsoft.com/en-us/resources/cloud-computing-dictionary/what
      - d) *Scale in rule* : performanceCounters/requestExecutionTime < 900 ms
 
    
+## References
+1. https://learn.microsoft.com/en-us/azure/load-testing/concept-load-testing-concepts
+2. https://learn.microsoft.com/en-us/azure/load-testing/quickstart-create-and-run-load-test
+3. https://learn.microsoft.com/en-us/azure/load-testing/how-to-high-scale-load
+4. https://github.com/Azure/azure-quickstart-templates/tree/master/quickstarts/microsoft.network
+5. https://github.com/Azure/azure-quickstart-templates/blob/master/quickstarts/microsoft.network/traffic-manager-webapp/azuredeploy.json
+6. https://github.com/Azure/azure-quickstart-templates/blob/master/quickstarts/microsoft.network/traffic-manager-vm/azuredeploy.json
