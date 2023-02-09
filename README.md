@@ -6,7 +6,7 @@ In cloud computing, cloud bursting is a configuration that’s set up between a 
 In addition to flexibility and self-service functionality, the key advantage to cloud bursting is economical savings. **You only pay for the additional resources when there is a demand for those resources - no more spending on extra capacity you’re not using or trying to predict demand peaks and fluctuations**. An application can be applied to the private cloud, then burst to the public cloud only when necessary to meet peak demands. Plus, cloud bursting can also be used to shoulder processing burdens by moving basic applications to the public cloud to free up local resources for business-critical applications. When using cloud bursting, you should **consider security and compliance requirements, latency, load balancing, and platform compatibility**.  
 src: https://azure.microsoft.com/en-us/resources/cloud-computing-dictionary/what-is-cloud-bursting/  
 
-## Abstract of the Solution Implemenetation Plan
+## Abstract of the Solution Implementation Plan
 - Example: An asp.net application running on-premise is instrumented with application insights
   - https://learn.microsoft.com/en-us/samples/azure/azure-quickstart-templates/vmss-windows-webapp-dsc-autoscale/
 - There is a cold stand-by setup on Azure.
@@ -26,4 +26,4 @@ src: https://azure.microsoft.com/en-us/resources/cloud-computing-dictionary/what
   - Note: 
       - If the load does not reduce, then the autoscale rule will continue to scale-out the vmss instances
       - When the load reduces, the autoscale rule should be able to scale the instances back in. This will stop when the metric is well within the limits of what can be handled by the on-premise infrastructure
-- Azure load testing tool needs to be used to exercise this scenario. Load pattern needs to be set in such a way that the burst happens to the cloud, continues to scale the scale-set beyond the first iteration and then slowly drop. A the end of the test, the traffic should be maintained at 80-90% of the Peak that on-premise can handle
+- Azure load testing tool needs to be used to exercise this scenario. Load pattern needs to be set in such a way that the burst happens to the cloud, continues to scale the scale-set beyond the first iteration and then slowly drop. At the end of the test, the traffic should be maintained at 80-90% of the Peak that on-premise can handle
