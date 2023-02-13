@@ -338,74 +338,16 @@
           }
         ]
       }
-    },
-    {
-      "type": "Microsoft.Insights/autoscalesettings",
-      "apiVersion": "2021-05-01-preview",
-      "name": "autoscalehost",
-      "location": "[parameters('location')]",
-      "properties": {
-        "name": "autoscalehost",
-        "targetResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', variables('vmScaleSetName'))]",
-        "enabled": true,
-        "profiles": [
-          {
-            "name": "Profile1",
-            "capacity": {
-              "minimum": "1",
-              "maximum": "10",
-              "default": "1"
-            },
-            "rules": [
-              {
-                "metricTrigger": {
-                  "metricName": "Percentage CPU",
-                  "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', variables('vmScaleSetName'))]",
-                  "timeGrain": "PT1M",
-                  "statistic": "Average",
-                  "timeWindow": "PT5M",
-                  "timeAggregation": "Average",
-                  "operator": "GreaterThan",
-                  "threshold": 50
-                },
-                "scaleAction": {
-                  "direction": "Increase",
-                  "type": "ChangeCount",
-                  "value": "1",
-                  "cooldown": "PT5M"
-                }
-              },
-              {
-                "metricTrigger": {
-                  "metricName": "Percentage CPU",
-                  "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', variables('vmScaleSetName'))]",
-                  "timeGrain": "PT1M",
-                  "statistic": "Average",
-                  "timeWindow": "PT5M",
-                  "timeAggregation": "Average",
-                  "operator": "LessThan",
-                  "threshold": 30
-                },
-                "scaleAction": {
-                  "direction": "Decrease",
-                  "type": "ChangeCount",
-                  "value": "1",
-                  "cooldown": "PT5M"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Compute/virtualMachineScaleSets', variables('vmScaleSetName'))]"
-      ]
     }
   ],
   "outputs": {
     "applicationUrl": {
       "type": "string",
       "value": "[uri(format('http://{0}', reference(resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))).dnsSettings.fqdn), '/MyApp')]"
+    },
+    "templatelinkUri":{
+      "type":"string",
+      "value":"[deployment().properties.templateLink.uri]"
     }
   }
 }
