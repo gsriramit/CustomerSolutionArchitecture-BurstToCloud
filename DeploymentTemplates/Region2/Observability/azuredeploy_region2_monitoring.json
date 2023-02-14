@@ -49,7 +49,37 @@
       "metadata": {
         "description": "Specify the number of days to retain data in Heartbeat table."
       }
-    }
+    },
+     "appInsightsName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of Application Insights resource."
+      }
+    },
+    "appType": {
+      "type": "string",
+      "metadata": {
+        "description": "Type of app you are deploying. This field is for legacy reasons and will not impact the type of App Insights resource you deploy."
+      }
+    },
+    "insightsRegionId": {
+      "type": "string",
+      "metadata": {
+        "description": "Which Azure Region to deploy the resource to. This must be a valid Azure regionId."
+      }
+    },
+    "tagsArray": {
+      "type": "object",
+      "metadata": {
+        "description": "See documentation on tags: https://learn.microsoft.com/azure/azure-resource-manager/management/tag-resources."
+      }
+    },
+    "insightsRequestSource": {
+      "type": "string",
+      "metadata": {
+        "description": "Source of Azure Resource Manager deployment"
+      }
+    }    
   },
   "resources": [
     {
@@ -75,6 +105,23 @@
         "retentionInDays": "[parameters('heartbeatTableRetention')]"
       },
       "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "[parameters('appInsightsName')]",
+      "location": "[parameters('insightsRegionId')]",
+      "tags": "[parameters('tagsArray')]",
+      "kind": "other",
+      "properties": {
+        "Application_Type": "[parameters('appType')]",
+        "Flow_Type": "Bluefield",
+        "Request_Source": "[parameters('insightsRequestSource')]",
+        "WorkspaceResourceId":"[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+      },
+       "dependsOn": [
         "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
       ]
     }

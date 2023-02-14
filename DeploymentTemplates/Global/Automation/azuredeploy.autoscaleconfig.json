@@ -1,0 +1,68 @@
+{
+    "location": "westus",
+    "tags": {},
+    "properties": {
+        "name": "secondary-Autoscale-63",
+        "enabled": false,
+        "targetResourceUri": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r2stamp2-workload-dev02/providers/Microsoft.Compute/virtualMachineScaleSets/secondary",
+        "profiles": [
+            {
+                "name": "Auto created default scale condition",
+                "capacity": {
+                    "minimum": "1",
+                    "maximum": "5",
+                    "default": "1"
+                },
+                "rules": [
+                    {
+                        "scaleAction": {
+                            "direction": "Increase",
+                            "type": "ChangeCount",
+                            "value": "2",
+                            "cooldown": "PT3M"
+                        },
+                        "metricTrigger": {
+                            "metricName": "performanceCounters/requestExecutionTime",
+                            "metricNamespace": "microsoft.insights/components",
+                            "metricResourceUri": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r2stamp2-workload-dev02/providers/microsoft.insights/components/missioncriticalappanalytics",
+                            "operator": "GreaterThan",
+                            "statistic": "Average",
+                            "threshold": 1000,
+                            "timeAggregation": "Average",
+                            "timeGrain": "PT1M",
+                            "timeWindow": "PT5M",
+                            "Dimensions": [],
+                            "dividePerInstance": false
+                        }
+                    },
+                    {
+                        "scaleAction": {
+                            "direction": "Decrease",
+                            "type": "ChangeCount",
+                            "value": "2",
+                            "cooldown": "PT3M"
+                        },
+                        "metricTrigger": {
+                            "metricName": "performanceCounters/requestExecutionTime",
+                            "metricNamespace": "microsoft.insights/components",
+                            "metricResourceUri": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r2stamp2-workload-dev02/providers/microsoft.insights/components/missioncriticalappanalytics",
+                            "operator": "LessThan",
+                            "statistic": "Average",
+                            "threshold": 500,
+                            "timeAggregation": "Average",
+                            "timeGrain": "PT1M",
+                            "timeWindow": "PT5M",
+                            "Dimensions": [],
+                            "dividePerInstance": false
+                        }
+                    }
+                ]
+            }
+        ],
+        "notifications": [],
+        "targetResourceLocation": "westus"
+    },
+    "id": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r2stamp2-workload-dev02/providers/microsoft.insights/autoscalesettings/secondary-Autoscale-63",
+    "name": "secondary-Autoscale-63",
+    "type": "Microsoft.Insights/autoscaleSettings"
+}

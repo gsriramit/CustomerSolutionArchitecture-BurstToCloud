@@ -40,7 +40,7 @@
     },
     "instanceCount": {
       "type": "int",
-      "defaultValue": 3,
+      "defaultValue": 1,
       "maxValue": 100,
       "minValue": 1,
       "metadata": {
@@ -83,14 +83,14 @@
     },
     "powershelldscZip": {
       "type": "string",
-      "defaultValue": "DSC/InstallIIS.zip",
+      "defaultValue": "dsc/InstallIIS.zip",
       "metadata": {
         "description": "Location of the PowerShell DSC zip file relative to the URI specified in the _artifactsLocation, i.e. DSC/IISInstall.ps1.zip"
       }
     },
     "webDeployPackage": {
       "type": "string",
-      "defaultValue": "WebDeploy/DefaultASPWebApp.v2.0.zip",
+      "defaultValue": "webdeploy/DefaultASPWebApp.v2.0.zip",
       "metadata": {
         "description": "Location of the  of the WebDeploy package zip file relative to the URI specified in _artifactsLocation, i.e. WebDeploy/DefaultASPWebApp.v1.0.zip"
       }
@@ -118,10 +118,10 @@
     }
   },
   "variables": {
-    "vmScaleSetName": "[toLower(substring(format('vmssName{0}', uniqueString(resourceGroup().id)), 0, 9))]",
+    "vmScaleSetName": "[toLower(substring(format('secondaryappinst{0}', uniqueString(resourceGroup().id)), 0, 9))]",
     "longvmScaleSet": "[toLower(parameters('vmssName'))]",
-    "addressPrefix": "10.0.0.0/16",
-    "subnetPrefix": "10.0.0.0/24",
+    "addressPrefix": "10.10.0.0/16",
+    "subnetPrefix": "10.10.1.0/24",
     "vNetName": "[format('{0}vnet', variables('vmScaleSetName'))]",
     "publicIPAddressName": "[format('{0}pip', variables('vmScaleSetName'))]",
     "subnetName": "[format('{0}subnet', variables('vmScaleSetName'))]",
@@ -303,7 +303,8 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]"
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
+        "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]"
       ]
     },
     {

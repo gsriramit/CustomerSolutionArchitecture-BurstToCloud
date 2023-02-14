@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
       "workspaceName": {
-        "value": "MyWorkspace"
+        "value": "r1-monitoring-workspace-dev01"
       },
       "sku": {
         "value": "PerGB2018"
@@ -17,5 +17,6 @@
       "heartbeatTableRetention": {
         "value": 30
       }
+     
     }
   }

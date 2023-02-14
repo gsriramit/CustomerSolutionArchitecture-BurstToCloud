@@ -10,6 +10,12 @@
     },
     "adminPassword": {
       "value": "adminpwd#789"
+    },
+    "_artifactsLocation":{
+      "value": "https://stawebserverdeploy01.blob.core.windows.net/"
+    },
+    "_artifactsLocationSasToken":{
+      "value": "?sv=2021-06-08&ss=b&srt=sco&sp=rdltfx&se=2023-02-15T14:42:22Z&st=2023-02-14T06:42:22Z&spr=https,http&sig=2MnO9BRJdYrMn%2FSF6tFi2pYdoNPEzX9HSkFRKG8xjjI%3D"
     }
   }
 }

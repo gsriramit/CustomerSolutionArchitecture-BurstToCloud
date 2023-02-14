@@ -3,19 +3,34 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "workspaceName": {
-      "value": "MyWorkspace"
+      "value": "r2-monitoring-workspace-dev01"
     },
     "sku": {
       "value": "PerGB2018"
     },
     "location": {
-      "value": "eastus"
+      "value": "westus"
     },
     "resourcePermissions": {
       "value": true
     },
     "heartbeatTableRetention": {
       "value": 30
+    },
+    "appType": {
+      "value": "web"
+    },
+    "appInsightsName": {
+      "value": "missioncriticalappanalytics"
+    },
+    "insightsRegionId": {
+      "value": "westus"
+    },
+    "tagsArray": {
+      "value": {}
+    },
+    "insightsRequestSource": {
+      "value": "CustomDeployment"
     }
   }
 }

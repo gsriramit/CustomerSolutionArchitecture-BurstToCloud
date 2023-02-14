@@ -83,14 +83,14 @@
     },
     "powershelldscZip": {
       "type": "string",
-      "defaultValue": "DSC/InstallIIS.zip",
+      "defaultValue": "dsc/InstallIIS.zip",
       "metadata": {
         "description": "Location of the PowerShell DSC zip file relative to the URI specified in the _artifactsLocation, i.e. DSC/IISInstall.ps1.zip"
       }
     },
     "webDeployPackage": {
       "type": "string",
-      "defaultValue": "WebDeploy/DefaultASPWebApp.v1.0.zip",
+      "defaultValue": "webdeploy/DefaultASPWebApp.v2.0.zip",
       "metadata": {
         "description": "Location of the  of the WebDeploy package zip file relative to the URI specified in _artifactsLocation, i.e. WebDeploy/DefaultASPWebApp.v1.0.zip"
       }
@@ -118,7 +118,7 @@
     }
   },
   "variables": {
-    "vmScaleSetName": "[toLower(substring(format('vmssName{0}', uniqueString(resourceGroup().id)), 0, 9))]",
+    "vmScaleSetName": "[toLower(substring(format('primaryappinst{0}', uniqueString(resourceGroup().id)), 0, 9))]",
     "longvmScaleSet": "[toLower(parameters('vmssName'))]",
     "addressPrefix": "10.0.0.0/16",
     "subnetPrefix": "10.0.0.0/24",
@@ -303,7 +303,8 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]"
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
+        "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]"
       ]
     },
     {
@@ -344,10 +345,6 @@
     "applicationUrl": {
       "type": "string",
       "value": "[uri(format('http://{0}', reference(resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))).dnsSettings.fqdn), '/MyApp')]"
-    },
-    "templatelinkUri":{
-      "type":"string",
-      "value":"[deployment().properties.templateLink.uri]"
     }
   }
 }

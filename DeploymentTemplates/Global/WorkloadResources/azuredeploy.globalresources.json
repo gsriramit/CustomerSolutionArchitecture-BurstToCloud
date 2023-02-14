@@ -1,94 +1,213 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "metadata": {
-      "_generator": {
-        "name": "bicep",
-        "version": "0.5.6.12127",
-        "templateHash": "10905973742322573613"
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.5.6.12127",
+      "templateHash": "10905973742322573613"
+    }
+  },
+  "parameters": {
+    "subscriptionId": {
+      "type": "string",
+      "metadata": {
+        "description": "subscription Id in which the endpoint resources are located"
       }
     },
-    "parameters": {
-      "uniqueDnsName": {
-        "type": "string",
-        "metadata": {
-          "description": "Relative DNS name for the traffic manager profile, resulting FQDN will be <uniqueDnsName>.trafficmanager.net, must be globally unique."
-        }
-      },
-      "uniqueDnsNameForOnpremWebApp": {
-        "type": "string",
-        "metadata": {
-          "description": "Relative DNS name for the WebApps, must be globally unique.  An index will be appended for each Web App."
-        }
-      },
-      "uniqueDnsNameForAzureWebApp": {
-        "type": "string",
-        "metadata": {
-          "description": "Relative DNS name for the WebApps, must be globally unique.  An index will be appended for each Web App."
-        }
-      },
-      "location": {
-        "type": "string",
-        "defaultValue": "[resourceGroup().location]"
-      },
-      "trafficManagerName": {
-        "type": "string",
-        "metadata": {
-          "description": "Name of the trafficManager being created"
-        }
-      },
-      "onpremEndpointPublicIpName": {
-        "type": "string",
-         "metadata": {
-          "description": "name of the public ip attached to the external load balancer in the on-premise environment"
-        }
-      },
-      "azureEndpointPublicIpName": {
-        "type": "string",
-         "metadata": {
-          "description": "name of the public ip attached to the external load balancer in the azure environment"
-        }
+    "onpremRgName": {
+      "type": "string",
+      "metadata": {
+        "description": "resource group in which the on-prem endpoint resources are located"
       }
     },
-    "resources": [
-      {
-        "type": "Microsoft.Network/trafficmanagerprofiles",
-        "apiVersion": "2018-08-01",
-        "name": "[parameters('trafficManagerName')]",
-        "location": "global",
-        "properties": {
-          "profileStatus": "Enabled",
-          "trafficRoutingMethod": "Weighted",
-          "dnsConfig": {
-            "relativeName": "[parameters('uniqueDnsName')]",
-            "ttl": 30
-          },
-          "monitorConfig": {
-            "protocol": "HTTP",
-            "port": 80,
-            "path": "/"
-          },
-          "endpoints": [
-            {
-              "name": "[parameters('uniqueDnsNameForOnpremWebApp')]",
-              "type": "Microsoft.Network/trafficManagerProfiles/azureEndpoints",
-              "properties": {
-                "targetResourceId": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('onpremEndpointPublicIpName'))]",
-                "endpointStatus": "Enabled",
-                "weight":100
-              }
-            },
-            {
-              "name": "[parameters('uniqueDnsNameForAzureWebApp')]",
-              "type": "Microsoft.Network/trafficManagerProfiles/azureEndpoints",
-              "properties": {
-                "targetResourceId": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('azureEndpointPublicIpName'))]",
-                "endpointStatus": "Disabled",
-                "weight":1
-              }
+    "azureWorkloadRgName": {
+      "type": "string",
+      "metadata": {
+        "description": "resource group in which the azure endpoint resources are located"
+      }
+    },
+    "uniqueDnsName": {
+      "type": "string",
+      "metadata": {
+        "description": "Relative DNS name for the traffic manager profile, resulting FQDN will be <uniqueDnsName>.trafficmanager.net, must be globally unique."
+      }
+    },
+    "uniqueDnsNameForOnpremWebApp": {
+      "type": "string",
+      "metadata": {
+        "description": "Relative DNS name for the WebApps, must be globally unique.  An index will be appended for each Web App."
+      }
+    },
+    "uniqueDnsNameForAzureWebApp": {
+      "type": "string",
+      "metadata": {
+        "description": "Relative DNS name for the WebApps, must be globally unique.  An index will be appended for each Web App."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "trafficManagerName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the trafficManager being created"
+      }
+    },
+    "onpremEndpointPublicIpName": {
+      "type": "string",
+      "metadata": {
+        "description": "name of the public ip attached to the external load balancer in the on-premise environment"
+      }
+    },
+    "azureEndpointPublicIpName": {
+      "type": "string",
+      "metadata": {
+        "description": "name of the public ip attached to the external load balancer in the azure environment"
+      }
+    },
+    "appInsightsName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of Application Insights resource."
+      }
+    },
+    "appType": {
+      "type": "string",
+      "metadata": {
+        "description": "Type of app you are deploying. This field is for legacy reasons and will not impact the type of App Insights resource you deploy."
+      }
+    },
+    "insightsRegionId": {
+      "type": "string",
+      "metadata": {
+        "description": "Which Azure Region to deploy the resource to. This must be a valid Azure regionId."
+      }
+    },
+    "tagsArray": {
+      "type": "object",
+      "metadata": {
+        "description": "See documentation on tags: https://learn.microsoft.com/azure/azure-resource-manager/management/tag-resources."
+      }
+    },
+    "insightsRequestSource": {
+      "type": "string",
+      "metadata": {
+        "description": "Source of Azure Resource Manager deployment"
+      }
+    },
+    "workspaceResourceId": {
+      "type":"string",
+      "defaultValue": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-monitoring-dev02/providers/Microsoft.OperationalInsights/workspaces/r2-monitoring-workspace-dev01"
+    },
+    "workspaceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Specify the name of the workspace."
+      }
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "PerGB2018",
+      "allowedValues": [
+        "CapacityReservation",
+        "Free",
+        "LACluster",
+        "PerGB2018",
+        "PerNode",
+        "Premium",
+        "Standalone",
+        "Standard"
+      ],
+      "metadata": {
+        "description": "Specify the pricing tier: PerGB2018 or legacy tiers (Free, Standalone, PerNode, Standard or Premium) which are not available to all customers."
+      }
+    },
+    "retentionInDays": {
+      "type": "int",
+      "defaultValue": 120,
+      "metadata": {
+        "description": "Specify the number of days to retain data."
+      }
+    },
+    "resourcePermissions": {
+      "type": "bool",
+      "metadata": {
+        "description": "Specify true to use resource or workspace permissions, or false to require workspace permissions."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/trafficmanagerprofiles",
+      "apiVersion": "2018-08-01",
+      "name": "[parameters('trafficManagerName')]",
+      "location": "global",
+      "properties": {
+        "profileStatus": "Enabled",
+        "trafficRoutingMethod": "Weighted",
+        "dnsConfig": {
+          "relativeName": "[parameters('uniqueDnsName')]",
+          "ttl": 30
+        },
+        "monitorConfig": {
+          "protocol": "HTTP",
+          "port": 80,
+          "path": "/",
+          "intervalInSeconds": 30,
+          "toleratedNumberOfFailures": 3,
+          "timeoutInSeconds": 10
+        },
+        "endpoints": [
+          {
+            "name": "[parameters('uniqueDnsNameForOnpremWebApp')]",
+            "type": "Microsoft.Network/trafficManagerProfiles/azureEndpoints",
+            "properties": {
+              "targetResourceId": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourcegroups/', parameters('onpremRgName'), '/providers/Microsoft.Network/publicIPAddresses/',parameters('onpremEndpointPublicIpName'))]",
+              "endpointStatus": "Disabled",
+              "weight": 1
             }
-          ]
+          },
+          {
+            "name": "[parameters('uniqueDnsNameForAzureWebApp')]",
+            "type": "Microsoft.Network/trafficManagerProfiles/azureEndpoints",
+            "properties": {
+              "targetResourceId": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourcegroups/', parameters('azureWorkloadRgName'), '/providers/Microsoft.Network/publicIPAddresses/',parameters('azureEndpointPublicIpName'))]",
+              "endpointStatus": "Enabled",
+              "weight": 99
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "[parameters('appInsightsName')]",
+      "location": "[parameters('insightsRegionId')]",
+      "tags": "[parameters('tagsArray')]",
+      "kind": "other",
+      "properties": {
+        "Application_Type": "[parameters('appType')]",
+        "Flow_Type": "Bluefield",
+        "Request_Source": "[parameters('insightsRequestSource')]"
+      }
+    },
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2021-12-01-preview",
+      "name": "[parameters('workspaceName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+          "name": "[parameters('sku')]"
+        },
+        "retentionInDays": "[parameters('retentionInDays')]",
+        "features": {
+          "enableLogAccessUsingOnlyResourcePermissions": "[parameters('resourcePermissions')]"
         }
       }
-    ]
-  }
+    }
+  ]
+}
