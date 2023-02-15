@@ -1,0 +1,486 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflows_trafficcontrol_name": {
+            "defaultValue": "MySampleTrafficControlApp",
+            "type": "string",
+            "metadata": {
+                "comment": "Your Logic app name."
+            }
+        },
+        "workflows_location": {
+            "defaultValue": "[resourceGroup().location]",
+            "type": "string"
+        },
+        "webapp_east_region_name": {
+            "defaultValue": "East US",
+            "type": "string",
+            "metadata": {
+                "comment": "The first region name of your web app."
+            }
+        },
+        "webapp_west_region_name": {
+            "defaultValue": "West US",
+            "type": "string",
+            "metadata": {
+                "comment": "The second region name of your web app."
+            }
+        },
+        "webapp_east_name": {
+            "defaultValue": "mywebappeastus.azurewebsites.net",
+            "type": "string",
+            "metadata": {
+                "comment": "Your web app name in the first region."
+            }
+        },
+        "webapp_west_name": {
+            "defaultValue": "mywebappwestus.azurewebsites.net",
+            "type": "string",
+            "metadata": {
+                "comment": "Your web app name in the second region."
+            }
+        },
+        "Frontdoors_myfrontdoor_subscription": {
+            "defaultValue": "[subscription().subscriptionId]",
+            "type": "string",
+            "metadata": {
+                "comment": "Subscription ID of your Azure Front Door instance. Remove this parameter if you are going to deploy your Logic app to the same subscription as your Front Door instance."
+            }
+        },
+        "Frontdoors_myfrontdoor_resourcegroup": {
+            "defaultValue": "[resourceGroup().name]",
+            "type": "string",
+            "metadata": {
+                "comment": "Resource group name of your Azure Front Door instance. Remove this parameter if you are going to deploy your Logic app to the same resrouce group as your Front Door instance."
+            }
+        }, 
+        "Frontdoors_myfrontdoor_name": {
+            "defaultValue": "myfrontdoor",
+            "type": "string",
+            "metadata": {
+                "comment": "Your Azure Front Door instance name."
+            }
+        },
+        "Frontdoors_backendpool_name": {
+            "defaultValue": "MyPool",
+            "type": "string",
+            "metadata": {
+                "comment": "The backend pool name in your Azure Front Door instance."
+            }
+        },
+        "Frontdoors_routingrule_name": {
+            "defaultValue": "rule1",
+            "type": "string",
+            "metadata": {
+                "comment": "The routing rule name in your Azure Front Door instance."
+            }
+        },
+        "connections_arm_name": {
+            "defaultValue": "arm",
+            "type": "string",
+            "metadata": {
+                "comment": "ARM connection name. Leave it as is."
+            }
+        },
+        "connections_arm_connectionid": {
+            "defaultValue": "[resourceId('Microsoft.Web/connections', parameters('connections_arm_name'))]",
+            "type": "string",
+            "metadata": {
+                "comment": "[resourceId(parameters('Frontdoors_myfrontdoor_subscription'), parameters('Frontdoors_myfrontdoor_resourcegroup'), 'Microsoft.Web/connections', parameters('connections_arm_name'))]"
+            }
+        },
+        "connections_arm_id": {
+            "defaultValue": "[subscriptionResourceId('Microsoft.Web/locations/managedApis', resourceGroup().location, parameters('connections_arm_name'))]",
+            "type": "string"
+        },
+        "Frontdoors_myfrontdoor_subresource_name" : {
+            "defaultValue": "[concat('frontDoors/', parameters('Frontdoors_myfrontdoor_name'))]",
+            "type": "string"
+        }
+    },
+    "variables": {
+        "Frontdoors_myfrontdoor_externalid": "[resourceId(parameters('Frontdoors_myfrontdoor_subscription'), parameters('Frontdoors_myfrontdoor_resourcegroup'), 'Microsoft.Network/Frontdoors', parameters('Frontdoors_myfrontdoor_name'))]",
+        "__encodeURIComponent__frontDoors_myfrontdoor____externalid": "/subscriptions/@{encodeURIComponent(parameters('Frontdoors_myfrontdoor_subscription'))}/resourceGroups/@{encodeURIComponent(parameters('Frontdoors_myfrontdoor_resourcegroup'))}/providers/@{encodeURIComponent('Microsoft.Network')}/@{encodeURIComponent(parameters('Frontdoors_myfrontdoor_subresource_name'))}"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[parameters('connections_arm_name')]",
+            "location": "[resourceGroup().location]",
+            "kind": "V1",
+            "properties": {
+                "displayName": "ARM Connection",
+                "customParameterValues": {},
+                "api": {
+                    "id": "[parameters('connections_arm_id')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('workflows_trafficcontrol_name')]",
+            "location": "[parameters('workflows_location')]",
+            "dependsOn": [
+                "[parameters('connections_arm_name')]"
+            ],
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "manual": {
+                            "type": "Request",
+                            "kind": "Http",
+                            "inputs": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "alertContext": {
+                                                    "properties": {},
+                                                    "type": "object"
+                                                },
+                                                "essentials": {
+                                                    "properties": {
+                                                        "alertContextVersion": {
+                                                            "type": "string"
+                                                        },
+                                                        "alertId": {
+                                                            "type": "string"
+                                                        },
+                                                        "alertRule": {
+                                                            "type": "string"
+                                                        },
+                                                        "alertTargetIDs": {
+                                                            "items": {
+                                                                "type": "string"
+                                                            },
+                                                            "type": "array"
+                                                        },
+                                                        "description": {
+                                                            "type": "string"
+                                                        },
+                                                        "essentialsVersion": {
+                                                            "type": "string"
+                                                        },
+                                                        "firedDateTime": {
+                                                            "type": "string"
+                                                        },
+                                                        "monitorCondition": {
+                                                            "type": "string"
+                                                        },
+                                                        "monitoringService": {
+                                                            "type": "string"
+                                                        },
+                                                        "originAlertId": {
+                                                            "type": "string"
+                                                        },
+                                                        "resolvedDateTime": {
+                                                            "type": "string"
+                                                        },
+                                                        "severity": {
+                                                            "type": "string"
+                                                        },
+                                                        "signalType": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "schemaId": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "actions": {
+                        "Condition": {
+                            "actions": {
+                                "Set_variable": {
+                                    "runAfter": {},
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "WestRegionWeight",
+                                        "value": 1
+                                    }
+                                },
+                                "Set_variable_2": {
+                                    "runAfter": {
+                                        "Set_variable": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "EastRegionWeight",
+                                        "value": 999
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Initialize_variable_2": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "else": {
+                                "actions": {
+                                    "Condition_2": {
+                                        "actions": {
+                                            "Set_variable_3": {
+                                                "runAfter": {},
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                    "name": "WestRegionWeight",
+                                                    "value": 999
+                                                }
+                                            },
+                                            "Set_variable_4": {
+                                                "runAfter": {
+                                                    "Set_variable_3": [
+                                                        "Succeeded"
+                                                    ]
+                                                },
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                    "name": "EastRegionWeight",
+                                                    "value": 1
+                                                }
+                                            }
+                                        },
+                                        "runAfter": {},
+                                        "expression": {
+                                            "or": [
+                                                {
+                                                    "contains": [
+                                                        "@triggerBody()?['data']?['essentials']?['description']",
+                                                        "[concat('Preparing for App Service Upgrade in ', parameters('webapp_east_region_name'))]"
+                                                    ]
+                                                },
+                                                {
+                                                    "contains": [
+                                                        "@triggerBody()?['data']?['essentials']?['description']",
+                                                        "[concat('Upgrade in Progress for App Service in ', parameters('webapp_east_region_name'))]"
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        "type": "If"
+                                    }
+                                }
+                            },
+                            "expression": {
+                                "or": [
+                                    {
+                                        "contains": [
+                                            "@triggerBody()?['data']?['essentials']?['description']",
+                                            "[concat('Preparing for App Service Upgrade in ', parameters('webapp_west_region_name'))]"
+                                        ]
+                                    },
+                                    {
+                                        "contains": [
+                                            "@triggerBody()?['data']?['essentials']?['description']",
+                                            "[concat('Upgrade in Progress for App Service in ', parameters('webapp_west_region_name'))]"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "type": "If"
+                        },
+                        "Create_or_update_a_resource": {
+                            "runAfter": {
+                                "Condition": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "location": "Global",
+                                    "properties": {
+                                        "backendPools": [
+                                            {
+                                                "id": "[concat(variables('Frontdoors_myfrontdoor_externalid'), '/BackendPools/', parameters('Frontdoors_backendpool_name'))]",
+                                                "name": "[parameters('Frontdoors_backendpool_name')]",
+                                                "properties": {
+                                                    "backends": [
+                                                        {
+                                                            "address": "[parameters('webapp_east_name')]",
+                                                            "backendHostHeader": "[parameters('webapp_east_name')]",
+                                                            "enabledState": "Enabled",
+                                                            "httpPort": 80,
+                                                            "httpsPort": 443,
+                                                            "priority": 1,
+                                                            "weight": "@variables('EastRegionWeight')"
+                                                        },
+                                                        {
+                                                            "address": "[parameters('webapp_west_name')]",
+                                                            "backendHostHeader": "[parameters('webapp_west_name')]",
+                                                            "enabledState": "Enabled",
+                                                            "httpPort": 80,
+                                                            "httpsPort": 443,
+                                                            "priority": 1,
+                                                            "weight": "@variables('WestRegionWeight')"
+                                                        }
+                                                    ],
+                                                    "healthProbeSettings": {
+                                                        "id": "[concat(variables('Frontdoors_myfrontdoor_externalid'), '/healthProbeSettings/healthProbeSettings-1604362160488')]"
+                                                    },
+                                                    "loadBalancingSettings": {
+                                                        "id": "[concat(variables('Frontdoors_myfrontdoor_externalid'), '/loadBalancingSettings/loadBalancingSettings-1604362160488')]"
+                                                    },
+                                                    "resourceState": "Enabled"
+                                                },
+                                                "type": "Microsoft.Network/Frontdoors/BackendPools"
+                                            }
+                                        ],
+                                        "friendlyName": "[parameters('Frontdoors_myfrontdoor_name')]",
+                                        "frontendEndpoints": [
+                                            {
+                                                "id": "[concat(variables('Frontdoors_myfrontdoor_externalid'), '/FrontendEndpoints/', parameters('Frontdoors_myfrontdoor_name'), '-azurefd-net')]",
+                                                "name": "[concat(parameters('Frontdoors_myfrontdoor_name'), '-azurefd-net')]",
+                                                "properties": {
+                                                    "customHttpsConfiguration": null,
+                                                    "customHttpsProvisioningState": null,
+                                                    "customHttpsProvisioningSubstate": null,
+                                                    "hostName": "[concat(parameters('Frontdoors_myfrontdoor_name'), '.azurefd.net')]",
+                                                    "resourceState": "Enabled",
+                                                    "sessionAffinityEnabledState": "Disabled",
+                                                    "sessionAffinityTtlSeconds": 0,
+                                                    "webApplicationFirewallPolicyLink": null
+                                                },
+                                                "type": "Microsoft.Network/Frontdoors/FrontendEndpoints"
+                                            }
+                                        ],
+                                        "healthProbeSettings": [
+                                            {
+                                                "id": "[concat(variables('Frontdoors_myfrontdoor_externalid'), '/HealthProbeSettings/healthProbeSettings-1604362160488')]",
+                                                "name": "healthProbeSettings-1604362160488",
+                                                "properties": {
+                                                    "intervalInSeconds": 30,
+                                                    "path": "/",
+                                                    "protocol": "Https",
+                                                    "resourceState": "Enabled"
+                                                },
+                                                "type": "Microsoft.Network/Frontdoors/HealthProbeSettings"
+                                            }
+                                        ],
+                                        "loadBalancingSettings": [
+                                            {
+                                                "id": "[concat(variables('Frontdoors_myfrontdoor_externalid'), '/LoadBalancingSettings/loadBalancingSettings-1604362160488')]",
+                                                "name": "loadBalancingSettings-1604362160488",
+                                                "properties": {
+                                                    "additionalLatencyMilliseconds": 0,
+                                                    "resourceState": "Enabled",
+                                                    "sampleSize": 4,
+                                                    "successfulSamplesRequired": 2
+                                                },
+                                                "type": "Microsoft.Network/Frontdoors/LoadBalancingSettings"
+                                            }
+                                        ],
+                                        "routingRules": [
+                                            {
+                                                "id": "[concat(variables('Frontdoors_myfrontdoor_externalid'), '/RoutingRules/', parameters('Frontdoors_routingrule_name'))]",
+                                                "name": "[parameters('Frontdoors_routingrule_name')]",
+                                                "properties": {
+                                                    "acceptedProtocols": [
+                                                        "Http",
+                                                        "Https"
+                                                    ],
+                                                    "backendPool": {
+                                                        "id": "[concat(variables('Frontdoors_myfrontdoor_externalid'), '/backendPools/', parameters('Frontdoors_backendpool_name'))]"
+                                                    },
+                                                    "cacheConfiguration": null,
+                                                    "customForwardingPath": null,
+                                                    "enabledState": "Enabled",
+                                                    "forwardingProtocol": "HttpsOnly",
+                                                    "frontendEndpoints": [
+                                                        {
+                                                            "id": "[concat(variables('Frontdoors_myfrontdoor_externalid'), '/frontendEndpoints/', parameters('Frontdoors_myfrontdoor_name'), '-azurefd-net')]"
+                                                        }
+                                                    ],
+                                                    "patternsToMatch": [
+                                                        "/*"
+                                                    ],
+                                                    "resourceState": "Enabled"
+                                                },
+                                                "type": "Microsoft.Network/Frontdoors/RoutingRules"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['arm']['connectionId']"
+                                    }
+                                },
+                                "method": "put",
+                                "path": "[variables('__encodeURIComponent__frontDoors_myfrontdoor____externalid')]",
+                                "queries": {
+                                    "x-ms-api-version": "2018-08-01"
+                                }
+                            }
+                        },
+                        "Initialize_variable": {
+                            "runAfter": {},
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "EastRegionWeight",
+                                        "type": "integer",
+                                        "value": 500
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_variable_2": {
+                            "runAfter": {
+                                "Initialize_variable": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "WestRegionWeight",
+                                        "type": "integer",
+                                        "value": 500
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "arm": {
+                                "connectionId": "[parameters('connections_arm_connectionid')]",
+                                "connectionName": "[parameters('connections_arm_name')]",
+                                "id": "[parameters('connections_arm_id')]"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

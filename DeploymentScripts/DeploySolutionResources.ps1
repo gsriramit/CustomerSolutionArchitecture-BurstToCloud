@@ -14,7 +14,7 @@ $global_rg_location="westus"
 #login
 Connect-AzAccount -Tenant $tenantId -Subscription $subscriptionId
 
-# Create the resource groups for regional anf global resources
+# Create the resource groups for regional and global resources
 New-AzResourceGroup -Location $region1_location -Name $region1_rg_stamp1
 New-AzResourceGroup -Location $region1_location -Name $region1_rg_monitoring
 New-AzResourceGroup -Location $region2_location -Name $region2_rg_stamp1
@@ -45,6 +45,11 @@ New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $region2_rg_mon
 
 
 ## Deploy global resources ##
+# Deploy Traffic Manager, Log Analytics workspace & Logic app
 New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $global_rg_Name `
 -TemplateFile "..\DeploymentTemplates\Global\WorkloadResources\azuredeploy.globalresources.json" `
 -TemplateParameterFile "..\DeploymentTemplates\Global\WorkloadResources\azuredeploy.globalresources.parameters.json"
+# Deploy the autoscale settings 
+New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $global_rg_Name `
+-TemplateFile "..\DeploymentTemplates\Global\Automation\azuredeploy.autoscaleconfig.json" `
+-TemplateParameterFile "..\DeploymentTemplates\Global\Automation\azuredeploy.autoscaleconfig.parameters.json"

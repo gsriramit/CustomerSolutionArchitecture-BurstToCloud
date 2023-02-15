@@ -1,0 +1,39 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflows_trafficcontrol_name": {
+            "value": "TrafficControlLogicApp"
+        },
+        "webapp_east_region_name": {
+            "value": "East US 2"
+        },
+        "webapp_west_region_name": {
+            "value": "West US"
+        },
+        "webapp_east_name": {
+            "value": "eastusapp01.azurewebsites.net"
+        },
+        "webapp_west_name": {
+            "value": "westusapp01.azurewebsites.net"
+        },
+        "Frontdoors_myfrontdoor_subscription": {
+            "value": "695471ea-1fc3-42ee-a854-eab6c3009516"
+        },
+        "Frontdoors_myfrontdoor_resourcegroup": {
+            "value": "rg-logicapptest-dev01"
+        },
+        "Frontdoors_myfrontdoor_name": {
+            "value": "gbllblogicappautomation"
+        },
+        "Frontdoors_backendpool_name": {
+            "value": "defaultorigingrp-01"
+        },
+        "Frontdoors_routingrule_name": {
+            "value": "rule1"
+        },
+        "connections_arm_name": {
+            "value": "arm"
+        }
+    }
+}

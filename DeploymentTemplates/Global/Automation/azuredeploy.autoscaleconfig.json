@@ -1,68 +1,138 @@
 {
-    "location": "westus",
-    "tags": {},
-    "properties": {
-        "name": "secondary-Autoscale-63",
-        "enabled": false,
-        "targetResourceUri": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r2stamp2-workload-dev02/providers/Microsoft.Compute/virtualMachineScaleSets/secondary",
-        "profiles": [
-            {
-                "name": "Auto created default scale condition",
-                "capacity": {
-                    "minimum": "1",
-                    "maximum": "5",
-                    "default": "1"
-                },
-                "rules": [
-                    {
-                        "scaleAction": {
-                            "direction": "Increase",
-                            "type": "ChangeCount",
-                            "value": "2",
-                            "cooldown": "PT3M"
-                        },
-                        "metricTrigger": {
-                            "metricName": "performanceCounters/requestExecutionTime",
-                            "metricNamespace": "microsoft.insights/components",
-                            "metricResourceUri": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r2stamp2-workload-dev02/providers/microsoft.insights/components/missioncriticalappanalytics",
-                            "operator": "GreaterThan",
-                            "statistic": "Average",
-                            "threshold": 1000,
-                            "timeAggregation": "Average",
-                            "timeGrain": "PT1M",
-                            "timeWindow": "PT5M",
-                            "Dimensions": [],
-                            "dividePerInstance": false
-                        }
-                    },
-                    {
-                        "scaleAction": {
-                            "direction": "Decrease",
-                            "type": "ChangeCount",
-                            "value": "2",
-                            "cooldown": "PT3M"
-                        },
-                        "metricTrigger": {
-                            "metricName": "performanceCounters/requestExecutionTime",
-                            "metricNamespace": "microsoft.insights/components",
-                            "metricResourceUri": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r2stamp2-workload-dev02/providers/microsoft.insights/components/missioncriticalappanalytics",
-                            "operator": "LessThan",
-                            "statistic": "Average",
-                            "threshold": 500,
-                            "timeAggregation": "Average",
-                            "timeGrain": "PT1M",
-                            "timeWindow": "PT5M",
-                            "Dimensions": [],
-                            "dividePerInstance": false
-                        }
-                    }
-                ]
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+         "autoscaleSettingName":{
+            "type":"string",
+            "metadata":{
+                "description": "autoscale setting name"
             }
-        ],
-        "notifications": [],
-        "targetResourceLocation": "westus"
+        },
+        "autoscaleResourceName":{
+            "type":"string",
+            "metadata":{
+                "description": "autoscale resource name"
+            }
+        },
+        "targetResourceSubscriptionId":{
+            "type":"string",
+            "metadata":{
+                "description": "subscription Id where the target vmss exists"
+            }
+        },
+        "targetResourceRg":{
+            "type":"string",
+            "metadata":{
+                "description": "resource group where the target vmss exists"
+            }
+        },
+        "targetResourceName":{
+            "type":"string",
+            "metadata":{
+                "description": "Name of the target vmss"
+            }
+        },
+        "appInsightsResource":{
+            "type":"string",
+            "metadata":{
+                "description":"Name of the app insights resource, metrics from which would be used to configure this autoscale setting"
+            }
+        },
+        "scalingMinInstanceCount":{
+            "type":"string",
+            "metadata":{
+                "description":"Minimum number of instances in the scale set"
+            }
+        },
+        "scalingMaxInstanceCount":{
+            "type":"string",
+            "metadata":{
+                "description":"Maximum number of instances in the scale set"
+            }
+        },
+        "scaleoutInstanceCount":{
+            "type":"string",
+            "metadata":{
+                "description":"Number of instances to add to the scale set when scaling out"
+            }
+        },
+         "scaleinInstanceCount":{
+            "type":"string",
+            "metadata":{
+                "description":"Number of instances to remove from the set when scaling in"
+            }
+        }
     },
-    "id": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r2stamp2-workload-dev02/providers/microsoft.insights/autoscalesettings/secondary-Autoscale-63",
-    "name": "secondary-Autoscale-63",
-    "type": "Microsoft.Insights/autoscaleSettings"
+    "resources": [
+        {
+            "location": "[resourceGroup().location]",
+            //"id": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r2stamp2-workload-dev02/providers/microsoft.insights/autoscalesettings/secondary-Autoscale-63",
+            "name": "[parameters('autoscaleResourceName')]",
+            "type": "Microsoft.Insights/autoscaleSettings",
+            "apiVersion": "2022-10-01",
+            "tags": {},
+            "properties": {
+                "name": "[parameters('autoscaleSettingName')]",
+                "enabled": false,
+                "targetResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('targetResourceRg'),'/providers/Microsoft.Compute/virtualMachineScaleSets/',parameters('targetResourceName'))]",
+                "profiles": [
+                    {
+                        "name": "Auto created default scale condition",
+                        "capacity": {
+                            "minimum": "[parameters('scalingMinInstanceCount')]",
+                            "maximum": "[parameters('scalingMaxInstanceCount')]",
+                            "default": "[parameters('scalingMinInstanceCount')]"
+                        },
+                        "rules": [
+                            {
+                                "scaleAction": {
+                                    "direction": "Increase",
+                                    "type": "ChangeCount",
+                                    "value": "[parameters('scaleoutInstanceCount')]",
+                                    "cooldown": "PT3M"
+                                },
+                                "metricTrigger": {
+                                    "metricName": "performanceCounters/requestExecutionTime",
+                                    "metricNamespace": "microsoft.insights/components",
+                                    "metricResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('targetResourceRg'),'/providers/microsoft.insights/components/',parameters('appInsightsResource'))]",
+                                    "operator": "GreaterThan",
+                                    "statistic": "Average",
+                                    "threshold": 1000,
+                                    "timeAggregation": "Average",
+                                    "timeGrain": "PT1M",
+                                    "timeWindow": "PT5M",
+                                    "Dimensions": [],
+                                    "dividePerInstance": false
+                                }
+                            },
+                            {
+                                "scaleAction": {
+                                    "direction": "Decrease",
+                                    "type": "ChangeCount",
+                                    "value": "[parameters('scaleinInstanceCount')]",
+                                    "cooldown": "PT3M"
+                                },
+                                "metricTrigger": {
+                                    "metricName": "performanceCounters/requestExecutionTime",
+                                    "metricNamespace": "microsoft.insights/components",
+                                    "metricResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('targetResourceRg'),'/providers/microsoft.insights/components/',parameters('appInsightsResource'))]",
+                                    "operator": "LessThan",
+                                    "statistic": "Average",
+                                    "threshold": 500,
+                                    "timeAggregation": "Average",
+                                    "timeGrain": "PT1M",
+                                    "timeWindow": "PT5M",
+                                    "Dimensions": [],
+                                    "dividePerInstance": false
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "notifications": [],
+                "targetResourceLocation": "westus"
+            }
+
+        }
+    ]
 }
