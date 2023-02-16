@@ -21,7 +21,7 @@
       "value": "web"
     },
     "appInsightsName": {
-      "value": "missioncriticalappanalytics"
+      "value": "r2appanalytics-02"
     },
     "insightsRegionId": {
       "value": "westus"

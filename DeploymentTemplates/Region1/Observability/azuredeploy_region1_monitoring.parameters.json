@@ -16,6 +16,21 @@
       },
       "heartbeatTableRetention": {
         "value": 30
+      },
+      "appType": {
+        "value": "web"
+      },
+      "appInsightsName": {
+        "value": "r2appanalytics-01"
+      },
+      "insightsRegionId": {
+        "value": "eastus"
+      },
+      "tagsArray": {
+        "value": {}
+      },
+      "insightsRequestSource": {
+        "value": "CustomDeployment"
       }
      
     }

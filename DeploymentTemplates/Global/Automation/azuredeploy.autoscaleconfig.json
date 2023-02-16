@@ -32,7 +32,25 @@
                 "description": "Name of the target vmss"
             }
         },
-        "appInsightsResource":{
+        "onpremappInsightsResource":{
+            "type":"string",
+            "metadata":{
+                "description":"Name of the app insights resource on-premise, metrics from which would be used to configure this autoscale setting"
+            }
+        },
+        "onpremMonitoringRg":{
+            "type":"string",
+            "metadata":{
+                "description": "resource group where the on-premise application insight resource exists"
+            }
+        },
+        "azMonitoringRg":{
+            "type":"string",
+            "metadata":{
+                "description": "resource group where the azure application insight resource exists"
+            }
+        },
+        "azappInsightsResource":{
             "type":"string",
             "metadata":{
                 "description":"Name of the app insights resource, metrics from which would be used to configure this autoscale setting"
@@ -94,7 +112,7 @@
                                 "metricTrigger": {
                                     "metricName": "performanceCounters/requestExecutionTime",
                                     "metricNamespace": "microsoft.insights/components",
-                                    "metricResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('targetResourceRg'),'/providers/microsoft.insights/components/',parameters('appInsightsResource'))]",
+                                    "metricResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('onpremMonitoringRg'),'/providers/microsoft.insights/components/',parameters('onpremappInsightsResource'))]",
                                     "operator": "GreaterThan",
                                     "statistic": "Average",
                                     "threshold": 1000,
@@ -115,7 +133,49 @@
                                 "metricTrigger": {
                                     "metricName": "performanceCounters/requestExecutionTime",
                                     "metricNamespace": "microsoft.insights/components",
-                                    "metricResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('targetResourceRg'),'/providers/microsoft.insights/components/',parameters('appInsightsResource'))]",
+                                    "metricResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('onpremMonitoringRg'),'/providers/microsoft.insights/components/',parameters('onpremappInsightsResource'))]",
+                                    "operator": "LessThan",
+                                    "statistic": "Average",
+                                    "threshold": 500,
+                                    "timeAggregation": "Average",
+                                    "timeGrain": "PT1M",
+                                    "timeWindow": "PT5M",
+                                    "Dimensions": [],
+                                    "dividePerInstance": false
+                                }
+                            },
+                            {
+                                "scaleAction": {
+                                    "direction": "Increase",
+                                    "type": "ChangeCount",
+                                    "value": "[parameters('scaleoutInstanceCount')]",
+                                    "cooldown": "PT3M"
+                                },
+                                "metricTrigger": {
+                                    "metricName": "performanceCounters/requestExecutionTime",
+                                    "metricNamespace": "microsoft.insights/components",
+                                    "metricResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('azMonitoringRg'),'/providers/microsoft.insights/components/',parameters('azappInsightsResource'))]",
+                                    "operator": "GreaterThan",
+                                    "statistic": "Average",
+                                    "threshold": 1000,
+                                    "timeAggregation": "Average",
+                                    "timeGrain": "PT1M",
+                                    "timeWindow": "PT5M",
+                                    "Dimensions": [],
+                                    "dividePerInstance": false
+                                }
+                            },
+                            {
+                                "scaleAction": {
+                                    "direction": "Decrease",
+                                    "type": "ChangeCount",
+                                    "value": "[parameters('scaleinInstanceCount')]",
+                                    "cooldown": "PT3M"
+                                },
+                                "metricTrigger": {
+                                    "metricName": "performanceCounters/requestExecutionTime",
+                                    "metricNamespace": "microsoft.insights/components",
+                                    "metricResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('azMonitoringRg'),'/providers/microsoft.insights/components/',parameters('azappInsightsResource'))]",
                                     "operator": "LessThan",
                                     "statistic": "Average",
                                     "threshold": 500,
