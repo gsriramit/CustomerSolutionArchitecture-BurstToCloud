@@ -1,0 +1,55 @@
+{
+  "properties": {
+    "context": {
+      "properties": {
+        "details": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "newCapacity": {
+          "type": "string"
+        },
+        "oldCapacity": {
+          "type": "string"
+        },
+        "portalLink": {
+          "type": "string"
+        },
+        "resourceGroupName": {
+          "type": "string"
+        },
+        "resourceId": {
+          "type": "string"
+        },
+        "resourceName": {
+          "type": "string"
+        },
+        "resourceType": {
+          "type": "string"
+        },
+        "subscriptionId": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "operation": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    }
+  },
+  "type": "object"
+}
