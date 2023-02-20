@@ -90,7 +90,7 @@
     },
     "webDeployPackage": {
       "type": "string",
-      "defaultValue": "webdeploy/DefaultASPWebApp.v2.0.zip",
+      "defaultValue": "webdeploy/cloudapp-01.zip",
       "metadata": {
         "description": "Location of the  of the WebDeploy package zip file relative to the URI specified in _artifactsLocation, i.e. WebDeploy/DefaultASPWebApp.v1.0.zip"
       }
