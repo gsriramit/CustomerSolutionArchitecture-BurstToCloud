@@ -5,6 +5,9 @@
     "vmssName": {
       "value": "reg2s1appscaleset"
     },
+    "vmSku": {
+      "value": "Standard_D4s_v3"
+    },
     "adminUsername": {
       "value": "adminaccount"
     },

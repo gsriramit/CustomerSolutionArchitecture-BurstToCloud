@@ -90,7 +90,7 @@
     },
     "webDeployPackage": {
       "type": "string",
-      "defaultValue": "webdeploy/bursttocloudapp-02.zip",
+      "defaultValue": "webdeploy/cloudapp-02.zip",
       "metadata": {
         "description": "Location of the  of the WebDeploy package zip file relative to the URI specified in _artifactsLocation, i.e. WebDeploy/DefaultASPWebApp.v1.0.zip"
       }
@@ -143,7 +143,7 @@
       "sku": "[parameters('windowsOSVersion')]",
       "version": "latest"
     },
-    "baseimageName":"vm-baseprep-dev01-image-20230222135708",
+    "baseimageName": "vm-baseprep-dev02-image-20230222195436",
     "imageReference": "[concat(subscription().id,'/resourceGroups/rg-global-dev01/providers/Microsoft.Compute/images/', variables('baseimageName'))]", /*"[variables('osType')]",*/
     "webDeployPackageFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('webDeployPackage'), parameters('_artifactsLocationSasToken')))]",
     "powershelldscZipFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('powershelldscZip'), parameters('_artifactsLocationSasToken')))]"
@@ -154,6 +154,10 @@
       "apiVersion": "2021-05-01",
       "name": "[variables('loadBalancerName')]",
       "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard",
+        "tier": "Regional"
+      },
       "properties": {
         "frontendIPConfigurations": [
           {
@@ -244,7 +248,9 @@
               "caching": "ReadWrite",
               "createOption": "FromImage"
             },
-            "imageReference": "[variables('imageReference')]"
+            "imageReference": {
+              "id": "[variables('imageReference')]"
+            }
           },
           "osProfile": {
             "computerNamePrefix": "[variables('vmScaleSetName')]",
@@ -289,7 +295,7 @@
                   "settings": {
                     "configuration": {
                       "url": "[variables('powershelldscZipFullPath')]",
-                      "script": "InstallIIS.ps1",
+                      "script": "DeployApp.ps1",
                       "function": "InstallIIS"
                     },
                     "configurationArguments": {
@@ -313,6 +319,10 @@
       "apiVersion": "2021-05-01",
       "name": "[variables('publicIPAddressName')]",
       "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard",
+        "tier": "Regional"
+      },
       "properties": {
         "publicIPAllocationMethod": "Static",
         "dnsSettings": {

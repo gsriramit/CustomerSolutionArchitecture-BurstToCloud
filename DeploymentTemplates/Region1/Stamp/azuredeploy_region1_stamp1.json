@@ -249,7 +249,9 @@
               "caching": "ReadWrite",
               "createOption": "FromImage"
             },
-            "imageReference": "[variables('imageReference')]"
+            "imageReference":{
+               "id": "[variables('imageReference')]"
+            } 
           },
           "osProfile": {
             "computerNamePrefix": "[variables('vmScaleSetName')]",
@@ -294,7 +296,7 @@
                   "settings": {
                     "configuration": {
                       "url": "[variables('powershelldscZipFullPath')]",
-                      "script": "InstallIIS.ps1",
+                      "script": "DeployApp.ps1",
                       "function": "InstallIIS"
                     },
                     "configurationArguments": {

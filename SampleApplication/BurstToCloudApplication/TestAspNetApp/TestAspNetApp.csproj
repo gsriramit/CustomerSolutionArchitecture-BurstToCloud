@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>92bf18b6-9c11-4217-a357-4d996a71f170</UserSecretsId>
-    <ApplicationInsightsResourceId>/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-monitoring-dev01/providers/microsoft.insights/components/missioncriticalappanalytics-02</ApplicationInsightsResourceId>
+    <ApplicationInsightsResourceId>/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r2stamp2-workload-dev02/providers/microsoft.insights/components/missioncriticalappanalytics</ApplicationInsightsResourceId>
   </PropertyGroup>
 
   <ItemGroup>
