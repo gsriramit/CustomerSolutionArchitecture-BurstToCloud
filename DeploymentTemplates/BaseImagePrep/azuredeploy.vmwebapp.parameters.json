@@ -1,0 +1,66 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "eastus"
+        },
+        "networkInterfaceName": {
+            "value": "vm-baseprep-dev0120"
+        },
+        "enableAcceleratedNetworking": {
+            "value": true
+        },
+        "subnetName": {
+            "value": "primaryapsubnet"
+        },
+        "virtualNetworkId": {
+            "value": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r1stamp1-workload-dev01/providers/Microsoft.Network/virtualNetworks/primaryapvnet"
+        },
+        "virtualMachineName": {
+            "value": "vm-baseprep-dev01"
+        },
+        "virtualMachineComputerName": {
+            "value": "vm-baseprep-dev"
+        },
+        "virtualMachineRG": {
+            "value": "rg-r1stamp1-workload-dev01"
+        },
+        "osDiskType": {
+            "value": "StandardSSD_LRS"
+        },
+        "osDiskDeleteOption": {
+            "value": "Delete"
+        },
+        "virtualMachineSize": {
+            "value": "Standard_D4s_v3"
+        },
+        "nicDeleteOption": {
+            "value": "Delete"
+        },
+        "adminUsername": {
+            "value": "adminaccount"
+        },
+        "adminPassword": {
+            "value": null
+        },
+        "patchMode": {
+            "value": "AutomaticByOS"
+        },
+        "enableHotpatching": {
+            "value": false
+        },
+        "customScriptStorageAccountName": {
+            "value": "stawebserverdeploy01"
+        },
+        "customScriptStorageAccountResourceGroup": {
+           "value":"rg-global-dev01"
+        },
+        "customScriptFileToRun": {
+            "value":"setwebserverenv.ps1"
+        },
+        "customScriptFileUri": {
+            "value": "https://stawebserverdeploy01.blob.core.windows.net/dsc/setwebserverenv.ps1"
+        }
+    }
+}

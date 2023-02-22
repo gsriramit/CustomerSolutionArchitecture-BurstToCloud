@@ -92,27 +92,47 @@ Configuration InstallIIS
         $false
       }
       SetScript  = {
+
+
+        ### Obsolete code (retained for reference)
+        #$Argument = '-source:package="C:\WindowsAzure\WebApplication.zip" -dest:auto,ComputerName="localhost", -verb:sync -allowUntrusted'
+        #Start-Process "$MSDeployPath\msdeploy.exe" $Argument -Verb runas 
+        #####
+
+        # Name and Path for the web application deployment package
         $Destination = "C:\WindowsAzure\WebApplication.zip"
+        # Set the version of the .net core hosting bundle
         $NetCoreHostingBundlePath="C:\WindowsAzure\dotnet-hosting-6.0.14-win.exe"
+        # Web request to download the application deployment package
         Invoke-WebRequest -Uri $using:WebDeployPackagePath -OutFile $Destination -Verbose
-        $Argument = '-source:package="C:\WindowsAzure\WebApplication.zip" -dest:auto,ComputerName="localhost", -verb:sync -allowUntrusted'
-        $MSDeployPath = (Get-ChildItem "HKLM:\SOFTWARE\Microsoft\IIS Extensions\MSDeploy" | Select -Last 1).GetValue("InstallPath")
+        # Get a reference to the path where the msdeploy.exe is located
+        $MSDeployPath = (Get-ChildItem "HKLM:\SOFTWARE\Microsoft\IIS Extensions\MSDeploy" | Select-Object -Last 1).GetValue("InstallPath")
         
+        # Web request to download the specific version of .net core hosting bundle
         Invoke-WebRequest -Uri https://download.visualstudio.microsoft.com/download/pr/321a2352-a7aa-492a-bd0d-491a963de7cc/6d17be7b07b8bc22db898db0ff37a5cc/dotnet-hosting-6.0.14-win.exe  -OutFile $NetCoreHostingBundlePath -Verbose
+        # Install the hosting bundle and restart the w3 service. This is a required step
         Start-Process -FilePath $NetCoreHostingBundlePath -Wait -ArgumentList /passive
         net stop was /y
         net start w3svc
 
+        # Add a Windows Defender Firewall rule to allow TCP connections on port 8080. If this is not done, then the VM instances will be rejecting 
+        # the health probe and the actual traffic received from the Azure load balancer. This would happen even though port 8080 would be 
+        # open at the application level i.e. a new site configured in the IIS with bindings to 8080
+        netsh advfirewall firewall add rule name="TCP Port 8080" dir=in action=allow protocol=TCP localport=8080
+        # Create a new directory where the app package contents would be extracted to 
         New-Item C:\inetpub\wwwroot\CloudApp -type Directory
+        # Import the web-administration module
         Import-Module webadministration
+        # This step is required before any IIS specific commands can be executed
         Set-Location IIS:\Sites
+        # Create a new site within IIS to host the application
         New-Item iis:\Sites\CloudAppSite -bindings @{protocol="http";bindingInformation=":8080:CloudAppSite"} -physicalPath C:\inetpub\wwwroot\CloudApp
 
+        # Set the current path to the where the msdeploy.exe is located
         Set-Location $MSDeployPath
+        # run the msdeploy command to deploy the app
         .\msdeploy.exe -source:package="C:\WindowsAzure\WebApplication.zip" -dest:contentPath="CloudAppSite" -verb:sync
-        #Start-Process "$MSDeployPath\msdeploy.exe" $Argument -Verb runas 
-
-        #To-Do upload a proper package to the storage account such that the files are directly within the webapplication folder. There should not be any nested folders
+                
       }
     }
   }
