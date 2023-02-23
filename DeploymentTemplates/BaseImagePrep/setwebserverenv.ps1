@@ -39,6 +39,6 @@ Import-Module webadministration
 # This step is required before any IIS specific commands can be executed
 Set-Location IIS:\Sites
 # Create a new site within IIS to host the application
-New-Item iis:\Sites\CloudAppSite -bindings @{protocol="http";bindingInformation=":8080:CloudAppSite"} -physicalPath C:\inetpub\wwwroot\CloudApp
+New-Item iis:\Sites\CloudAppSite -bindings @{protocol="http";bindingInformation=":8080:"} -physicalPath C:\inetpub\wwwroot\CloudApp
 
 

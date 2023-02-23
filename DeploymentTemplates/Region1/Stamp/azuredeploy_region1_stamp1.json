@@ -143,7 +143,7 @@
       "sku": "[parameters('windowsOSVersion')]",
       "version": "latest"
     },
-    "baseimageName":"vm-baseprep-dev01-image-20230222134256",
+    "baseimageName":"vm-basewebserver-img_eastus_v1.0",
     "imageReference": "[concat(subscription().id,'/resourceGroups/rg-global-dev01/providers/Microsoft.Compute/images/', variables('baseimageName'))]", /*"[variables('osType')]",*/
     "webDeployPackageFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('webDeployPackage'), parameters('_artifactsLocationSasToken')))]",
     "powershelldscZipFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('powershelldscZip'), parameters('_artifactsLocationSasToken')))]"
