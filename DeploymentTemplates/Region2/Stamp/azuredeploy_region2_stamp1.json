@@ -119,12 +119,15 @@
   },
   "variables": {
     "vmScaleSetName": "[toLower(substring(format('secondaryappinst{0}', uniqueString(resourceGroup().id)), 0, 9))]",
+    "networkSecurityGroup": "WebTierNetworkSecurityGroup",
     "longvmScaleSet": "[toLower(parameters('vmssName'))]",
     "addressPrefix": "10.10.0.0/16",
-    "subnetPrefix": "10.10.1.0/24",
+    "webSubnetPrefix": "10.10.1.0/24",
+    "bastionSubnetPrefix": "10.10.2.0/26",
     "vNetName": "[format('{0}vnet', variables('vmScaleSetName'))]",
     "publicIPAddressName": "[format('{0}pip', variables('vmScaleSetName'))]",
-    "subnetName": "[format('{0}subnet', variables('vmScaleSetName'))]",
+    "webSubnetName": "[format('{0}subnet', variables('vmScaleSetName'))]",
+    "bastionSubnetName": "AzureBastionSubnet",
     "loadBalancerName": "[format('{0}lb', variables('vmScaleSetName'))]",
     "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
     "lbProbeID": "[resourceId('Microsoft.Network/loadBalancers/probes', variables('loadBalancerName'), 'tcpProbe')]",
@@ -331,10 +334,58 @@
       }
     },
     {
+      "apiVersion": "2017-06-01",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('networkSecurityGroup')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "network-security-group"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "AllowTagHTTPInbound",
+            "properties": {
+              "description": "http endpoint",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRanges": [
+                    "80",
+                    "8080",
+                    "443"
+                ],
+              "sourceAddressPrefix": "Internet",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AllowTagRDPInbound",
+            "properties": {
+              "description": "rdp endpoint",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 110,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
       "type": "Microsoft.Network/virtualNetworks",
       "apiVersion": "2021-05-01",
       "name": "[variables('vNetName')]",
       "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup'))]"
+      ],
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
@@ -343,9 +394,21 @@
         },
         "subnets": [
           {
-            "name": "[variables('subnetName')]",
+            "name": "[variables('webSubnetName')]",
             "properties": {
-              "addressPrefix": "[variables('subnetPrefix')]"
+              "addressPrefix": "[variables('webSubnetPrefix')]",
+               "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup'))]"
+              }
+            }
+          },
+          {          
+            "name": "[variables('bastionSubnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('bastionSubnetPrefix')]",
+              "delegations": [],
+              "privateEndpointNetworkPolicies": "Disabled",
+              "privateLinkServiceNetworkPolicies": "Enabled"
             }
           }
         ]
