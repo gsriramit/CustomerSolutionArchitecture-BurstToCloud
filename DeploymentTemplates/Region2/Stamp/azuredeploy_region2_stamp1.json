@@ -203,7 +203,7 @@
               },
               "protocol": "Tcp",
               "frontendPort": 80,
-              "backendPort": 80,
+              "backendPort": 8080,
               "enableFloatingIP": false,
               "idleTimeoutInMinutes": 5,
               "probe": {
@@ -217,7 +217,7 @@
             "name": "tcpProbe",
             "properties": {
               "protocol": "Tcp",
-              "port": 80,
+              "port": 8080,
               "intervalInSeconds": 5,
               "numberOfProbes": 2
             }
