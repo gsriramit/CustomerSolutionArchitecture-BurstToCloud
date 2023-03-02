@@ -14,15 +14,23 @@
     "adminPassword": {
       "value": "adminpwd#789"
     },
-    "_artifactsLocation":{
+    "_artifactsLocation": {
       "value": "https://stawebserverdeploy01.blob.core.windows.net/"
     },
-    "_artifactsLocationSasToken":{
+    "_artifactsLocationSasToken": {
       "value": "?sv=2021-06-08&ss=b&srt=sco&sp=rlitx&se=2023-03-10T14:18:23Z&st=2023-02-20T06:18:23Z&spr=https,http&sig=JUcCz0ry%2BSY689HASy3ZvgjmS2rBxKIVcfv3cm9nYtI%3D"
     },
-    "instanceCount":{
-      "value":2
+    "instanceCount": {
+      "value": 2
+    },
+    "sqlserver_name": {
+      "value": "sqlserver-reg1st1-dev01"
+    },
+    "sqlAdministratorLoginPassword": {
+      "value": "Adminpwd#789"
+    },
+    "stateDBName":{
+      "value":"svc-Todo-primaryDb"
     }
   }
 }
-

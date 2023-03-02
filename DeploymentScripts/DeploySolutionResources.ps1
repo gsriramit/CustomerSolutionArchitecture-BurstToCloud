@@ -9,7 +9,9 @@ $subscriptionId= "695471ea-1fc3-42ee-a854-eab6c3009516"
 $region1_location="eastus"
 $region2_location="westus"
 $global_rg_location="westus"
-
+$databasename = "svc-Todo-primaryDb"
+$primaryServerName ="sqlserver-reg1st1-dev01" 
+$secondaryServerName = "sqlserver-reg2st1-dev01" 
 
 #login
 Connect-AzAccount -Tenant $tenantId -Subscription $subscriptionId
@@ -42,6 +44,10 @@ New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $region2_rg_sta
 New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $region2_rg_monitoring `
 -TemplateFile "..\DeploymentTemplates\Region2\Observability\azuredeploy_region2_monitoring.json" `
 -TemplateParameterFile "..\DeploymentTemplates\Region2\Observability\azuredeploy_region2_monitoring.parameters.json"
+
+# Add the geo-replica of the database in the on-premise stamp
+$database = Get-AzSqlDatabase -DatabaseName $databasename -ResourceGroupName $region1_rg_stamp1 -ServerName $primaryServerName
+$database | New-AzSqlDatabaseSecondary -PartnerResourceGroupName $region2_rg_stamp1 -PartnerServerName $secondaryServerName -AllowConnections "All"
 
 
 ## Deploy global resources ##

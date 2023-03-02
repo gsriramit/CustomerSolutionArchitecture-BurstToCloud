@@ -115,6 +115,16 @@
       "metadata": {
         "description": "Fault Domain count for each placement group."
       }
+    },
+    "sqlserver_name": {
+      "defaultValue": "sqlserver-reg1st1-dev01",
+      "type": "String"
+    },
+    "sqlAdministratorLoginPassword": {
+      "type": "String"
+    },
+    "stateDBName":{
+      "type": "string"
     }
   },
   "variables": {
@@ -414,7 +424,64 @@
           }
         ]
       }
-    }
+    },
+    {
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2022-05-01-preview",
+            "name": "[parameters('sqlserver_name')]",
+            "location": "eastus",
+            "tags": {
+                "displayName": "SqlServer"
+            },
+            "kind": "v12.0",
+            "properties": {
+                "administratorLogin": "sqladmin",
+                "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
+                "version": "12.0",
+                "publicNetworkAccess": "Enabled",
+                "restrictOutboundNetworkAccess": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases",
+            "apiVersion": "2022-05-01-preview",
+            "name": "[concat(parameters('sqlserver_name'), '/',parameters('stateDBName'))]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlserver_name'))]"
+            ],
+            "tags": {
+                "displayName": "Database"
+            },
+            "sku": {
+                "name": "GP_S_Gen5",
+                "tier": "GeneralPurpose",
+                "family": "Gen5",
+                "capacity": 1
+            },
+            "kind": "v12.0,user,vcore,serverless",
+            "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "maxSizeBytes": 10737418240,
+                "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                "zoneRedundant": false,
+                "readScale": "Disabled",
+                "autoPauseDelay": 60,
+                "requestedBackupStorageRedundancy": "Local"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+            "apiVersion": "2022-05-01-preview",
+            "name": "[concat(parameters('sqlserver_name'), '/',parameters('stateDBName'),'/Current')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlserver_name'), parameters('stateDBName'))]",
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlserver_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled"
+            }
+        }
   ],
   "outputs": {
     "applicationUrl": {
