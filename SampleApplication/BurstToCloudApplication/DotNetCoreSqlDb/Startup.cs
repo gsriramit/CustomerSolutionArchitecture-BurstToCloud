@@ -28,6 +28,7 @@ namespace DotNetCoreSqlDb
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddApplicationInsightsTelemetry();
             services.AddSingleton<IHttpContextAccessor,HttpContextAccessor>();
             services.AddDbContext<MyDatabaseContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("MyDbConnection")));
