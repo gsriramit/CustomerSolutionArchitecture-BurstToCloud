@@ -2,10 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <ApplicationInsightsResourceId>/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-monitoring-dev01/providers/microsoft.insights/components/missioncriticalappanalytics-02</ApplicationInsightsResourceId>
+    <UserSecretsId>32d04188-f1d6-4abf-a15f-cc28d4a8e09e</UserSecretsId>
   </PropertyGroup>
 
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.15.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0">
