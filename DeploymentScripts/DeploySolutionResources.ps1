@@ -7,8 +7,8 @@ $global_rg_Name = "rg-global-dev01"
 $tenantId="d787514b-d3f2-45ff-9bf1-971fb473fc85"
 $subscriptionId= "695471ea-1fc3-42ee-a854-eab6c3009516"
 $region1_location="eastus"
-$region2_location="westus"
-$global_rg_location="westus"
+$region2_location="eastus"
+$global_rg_location="eastus"
 $databasename = "svc-Todo-primaryDb"
 $primaryServerName ="sqlserver-reg1st1-dev01" 
 $secondaryServerName = "sqlserver-reg2st1-dev01" 
@@ -49,6 +49,15 @@ New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $region2_rg_mon
 $database = Get-AzSqlDatabase -DatabaseName $databasename -ResourceGroupName $region1_rg_stamp1 -ServerName $primaryServerName
 $database | New-AzSqlDatabaseSecondary -PartnerResourceGroupName $region2_rg_stamp1 -PartnerServerName $secondaryServerName -AllowConnections "All"
 
+# add the peering between the networks
+# Get a reference to the on-premise virtual network.
+$vnet1 = Get-AzVirtualNetwork -ResourceGroupName $region1_rg_stamp1 -Name 'primaryapvnet'
+# Get a reference to the azure stamp virtual network.
+$vnet2 = New-AzVirtualNetwork -ResourceGroupName $rgName -Name 'secondaryvnet'
+# Peer VNet1 to VNet2.
+Add-AzVirtualNetworkPeering -Name 'LinkOnPremiseToAzure' -VirtualNetwork $vnet1 -RemoteVirtualNetworkId $vnet2.Id
+# Peer VNet2 to VNet1.
+Add-AzVirtualNetworkPeering -Name 'LinkAzureToOnPremise' -VirtualNetwork $vnet2 -RemoteVirtualNetworkId $vnet1.Id
 
 ## Deploy global resources ##
 # Deploy Traffic Manager, Log Analytics workspace & Logic app

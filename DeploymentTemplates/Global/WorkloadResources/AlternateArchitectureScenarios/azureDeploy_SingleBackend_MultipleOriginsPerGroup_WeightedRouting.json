@@ -92,7 +92,7 @@
                   "weight": 50,
                   "enabledState": "Enabled"
                 },
-				{
+                {
                   "address": "[parameters('secondaryAppEndpointAddress')]",
                   "httpPort": 80,
                   "httpsPort": 443,

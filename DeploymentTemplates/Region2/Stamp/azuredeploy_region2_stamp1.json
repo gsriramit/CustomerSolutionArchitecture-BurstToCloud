@@ -131,10 +131,12 @@
     "addressPrefix": "10.10.0.0/16",
     "webSubnetPrefix": "10.10.1.0/24",
     "bastionSubnetPrefix": "10.10.2.0/26",
+    "privatendpointSubnetPrefix": "10.10.2.0/26",
     "vNetName": "[format('{0}vnet', variables('vmScaleSetName'))]",
     "publicIPAddressName": "[format('{0}pip', variables('vmScaleSetName'))]",
     "webSubnetName": "[format('{0}subnet', variables('vmScaleSetName'))]",
     "bastionSubnetName": "AzureBastionSubnet",
+    "privatendpointSubnetName":"subnet-pvtendpoints",
     "loadBalancerName": "[format('{0}lb', variables('vmScaleSetName'))]",
     "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
     "lbProbeID": "[resourceId('Microsoft.Network/loadBalancers/probes', variables('loadBalancerName'), 'tcpProbe')]",
@@ -413,6 +415,15 @@
             "name": "[variables('bastionSubnetName')]",
             "properties": {
               "addressPrefix": "[variables('bastionSubnetPrefix')]",
+              "delegations": [],
+              "privateEndpointNetworkPolicies": "Disabled",
+              "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+          },
+          {          
+            "name": "[variables('privatendpointSubnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('privatendpointSubnetPrefix')]",
               "delegations": [],
               "privateEndpointNetworkPolicies": "Disabled",
               "privateLinkServiceNetworkPolicies": "Enabled"
