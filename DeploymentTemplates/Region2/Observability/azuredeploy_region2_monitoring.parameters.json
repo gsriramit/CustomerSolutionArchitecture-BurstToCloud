@@ -9,7 +9,7 @@
       "value": "PerGB2018"
     },
     "location": {
-      "value": "eastus"
+      "value": "westus"
     },
     "resourcePermissions": {
       "value": true
@@ -24,7 +24,7 @@
       "value": "r2appanalytics-02"
     },
     "insightsRegionId": {
-      "value": "eastus"
+      "value": "westus"
     },
     "tagsArray": {
       "value": {}
