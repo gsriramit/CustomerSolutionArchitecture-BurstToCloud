@@ -110,12 +110,12 @@
                                     "cooldown": "PT3M"
                                 },
                                 "metricTrigger": {
-                                    "metricName": "performanceCounters/requestExecutionTime",
+                                    "metricName": "requests/rate",
                                     "metricNamespace": "microsoft.insights/components",
                                     "metricResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('onpremMonitoringRg'),'/providers/microsoft.insights/components/',parameters('onpremappInsightsResource'))]",
                                     "operator": "GreaterThan",
                                     "statistic": "Average",
-                                    "threshold": 1000,
+                                    "threshold": 600,
                                     "timeAggregation": "Average",
                                     "timeGrain": "PT1M",
                                     "timeWindow": "PT5M",
@@ -131,7 +131,7 @@
                                     "cooldown": "PT3M"
                                 },
                                 "metricTrigger": {
-                                    "metricName": "performanceCounters/requestExecutionTime",
+                                    "metricName": "requests/rate",
                                     "metricNamespace": "microsoft.insights/components",
                                     "metricResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('onpremMonitoringRg'),'/providers/microsoft.insights/components/',parameters('onpremappInsightsResource'))]",
                                     "operator": "LessThan",
@@ -152,7 +152,7 @@
                                     "cooldown": "PT3M"
                                 },
                                 "metricTrigger": {
-                                    "metricName": "performanceCounters/requestExecutionTime",
+                                    "metricName": "requests/rate",
                                     "metricNamespace": "microsoft.insights/components",
                                     "metricResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('azMonitoringRg'),'/providers/microsoft.insights/components/',parameters('azappInsightsResource'))]",
                                     "operator": "GreaterThan",
@@ -173,12 +173,12 @@
                                     "cooldown": "PT3M"
                                 },
                                 "metricTrigger": {
-                                    "metricName": "performanceCounters/requestExecutionTime",
+                                    "metricName": "requests/rate",
                                     "metricNamespace": "microsoft.insights/components",
                                     "metricResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('azMonitoringRg'),'/providers/microsoft.insights/components/',parameters('azappInsightsResource'))]",
                                     "operator": "LessThan",
                                     "statistic": "Average",
-                                    "threshold": 500,
+                                    "threshold": 700,
                                     "timeAggregation": "Average",
                                     "timeGrain": "PT1M",
                                     "timeWindow": "PT5M",
@@ -190,7 +190,7 @@
                     }
                 ],
                 "notifications": [],
-                "targetResourceLocation": "westus"
+                "targetResourceLocation": "eastus"
             }
 
         }

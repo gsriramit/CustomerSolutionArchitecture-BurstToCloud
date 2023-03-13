@@ -465,10 +465,10 @@
                 "displayName": "Database"
             },
             "sku": {
-                "name": "GP_S_Gen5",
-                "tier": "GeneralPurpose",
+                "name": "BC_Gen5",
+                "tier": "BusinessCritical",
                 "family": "Gen5",
-                "capacity": 1
+                "capacity": 2
             },
             "kind": "v12.0,user,vcore,serverless",
             "properties": {
