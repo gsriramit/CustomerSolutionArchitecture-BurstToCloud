@@ -1,0 +1,24 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflows_la_bursttocloud_name": {
+            "value": ""
+        },
+        "trafficManagerProfiles_globallb_dev01_externalid": {
+            "value": ""
+        },
+        "publicIPAddresses_primaryappip_externalid": {
+            "value": ""
+        },
+        "publicIPAddresses_secondarypip_externalid": {
+            "value": ""
+        },
+        "__encodeURIComponent__trafficmanagerprofiles_globallb_dev01____externalid": {
+            "value": ""
+        },
+        "connections_arm_1_externalid": {
+            "value": ""
+        }
+    }
+}

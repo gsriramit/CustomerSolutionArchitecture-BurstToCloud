@@ -1,0 +1,708 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflows_la_bursttocloud_name": {
+            "defaultValue": "trafficmgmtapp-dev01",
+            "type": "String"
+        },
+        "trafficManagerProfile_id": {
+            "defaultValue": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-global-dev01/providers/Microsoft.Network/trafficManagerProfiles/globallb-dev01",
+            "type": "String"
+        },
+        "primaryRegionpip_id": {
+            "defaultValue": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r1stamp1-workload-dev01/providers/Microsoft.Network/publicIPAddresses/primaryappip",
+            "type": "String"
+        },
+        "secondaryRegionpip_id": {
+            "defaultValue": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r2stamp2-workload-dev02/providers/Microsoft.Network/publicIPAddresses/secondarypip",
+            "type": "String"
+        },
+        "__encodeURIComponent__trafficmanagerprofiles____externalid": {
+            "defaultValue": "/subscriptions/@{encodeURIComponent('695471ea-1fc3-42ee-a854-eab6c3009516')}/resourceGroups/@{encodeURIComponent('rg-global-dev01')}/providers/@{encodeURIComponent('Microsoft.Network')}/@{encodeURIComponent('trafficmanagerprofiles/globallb-dev01')}",
+            "type": "String"
+        },
+         "connections_arm_name": {
+            "defaultValue": "arm-2",
+            "type": "string",
+            "metadata": {
+                "comment": "ARM connection name. Leave it as is."
+            }
+        },
+        "connections_arm_id": {
+            "defaultValue": "[subscriptionResourceId('Microsoft.Web/locations/managedApis', resourceGroup().location, parameters('connections_arm_name'))]",
+            "type": "string"
+        },
+        "connections_arm_1_connectionId": {
+            "defaultValue": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-global-dev01/providers/Microsoft.Web/connections/arm-2",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[parameters('connections_arm_name')]",
+            "location": "[resourceGroup().location]",
+            "kind": "V1",
+            "properties": {
+                "displayName": "ARM Connection",
+                "customParameterValues": {},
+                "api": {
+                    "id": "[parameters('connections_arm_id')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('workflows_la_bursttocloud_name')]",
+            "location": "westus",
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "manual": {
+                            "type": "Request",
+                            "kind": "Http",
+                            "inputs": {
+                                "schema": {
+                                    "properties": {
+                                        "body": {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "alertContext": {
+                                                            "properties": {
+                                                                "condition": {
+                                                                    "properties": {
+                                                                        "allOf": {
+                                                                            "items": {
+                                                                                "properties": {
+                                                                                    "dimensions": {
+                                                                                        "items": {
+                                                                                            "properties": {
+                                                                                                "name": {
+                                                                                                    "type": "string"
+                                                                                                },
+                                                                                                "value": {
+                                                                                                    "type": "string"
+                                                                                                }
+                                                                                            },
+                                                                                            "required": [
+                                                                                                "name",
+                                                                                                "value"
+                                                                                            ],
+                                                                                            "type": "object"
+                                                                                        },
+                                                                                        "type": "array"
+                                                                                    },
+                                                                                    "metricName": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "metricNamespace": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "metricValue": {
+                                                                                        "type": "integer"
+                                                                                    },
+                                                                                    "operator": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "threshold": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "timeAggregation": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "webTestName": {}
+                                                                                },
+                                                                                "required": [
+                                                                                    "metricName",
+                                                                                    "metricNamespace",
+                                                                                    "operator",
+                                                                                    "threshold",
+                                                                                    "timeAggregation",
+                                                                                    "dimensions",
+                                                                                    "metricValue",
+                                                                                    "webTestName"
+                                                                                ],
+                                                                                "type": "object"
+                                                                            },
+                                                                            "type": "array"
+                                                                        },
+                                                                        "windowEndTime": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "windowSize": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "windowStartTime": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                },
+                                                                "conditionType": {
+                                                                    "type": "string"
+                                                                },
+                                                                "properties": {
+                                                                    "properties": {
+                                                                        "customKey1": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "customKey2": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "customProperties": {
+                                                            "properties": {
+                                                                "customKey2": {
+                                                                    "type": "string"
+                                                                },
+                                                                "isScaleOut": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "essentials": {
+                                                            "properties": {
+                                                                "alertContextVersion": {
+                                                                    "type": "string"
+                                                                },
+                                                                "alertId": {
+                                                                    "type": "string"
+                                                                },
+                                                                "alertRule": {
+                                                                    "type": "string"
+                                                                },
+                                                                "alertTargetIDs": {
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "type": "array"
+                                                                },
+                                                                "configurationItems": {
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "type": "array"
+                                                                },
+                                                                "description": {
+                                                                    "type": "string"
+                                                                },
+                                                                "essentialsVersion": {
+                                                                    "type": "string"
+                                                                },
+                                                                "firedDateTime": {
+                                                                    "type": "string"
+                                                                },
+                                                                "monitorCondition": {
+                                                                    "type": "string"
+                                                                },
+                                                                "monitoringService": {
+                                                                    "type": "string"
+                                                                },
+                                                                "originAlertId": {
+                                                                    "type": "string"
+                                                                },
+                                                                "severity": {
+                                                                    "type": "string"
+                                                                },
+                                                                "signalType": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "schemaId": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "headers": {
+                                            "properties": {
+                                                "Connection": {
+                                                    "type": "string"
+                                                },
+                                                "Content-Length": {
+                                                    "type": "string"
+                                                },
+                                                "Content-Type": {
+                                                    "type": "string"
+                                                },
+                                                "Expect": {
+                                                    "type": "string"
+                                                },
+                                                "Host": {
+                                                    "type": "string"
+                                                },
+                                                "User-Agent": {
+                                                    "type": "string"
+                                                },
+                                                "X-CorrelationContext": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "actions": {
+                        "Condition": {
+                            "actions": {
+                                "SetAzEndpointUpdatedWeight": {
+                                    "runAfter": {
+                                        "SetOnPremEndpointUpdatedWeight": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "AzureUpdatedWeight",
+                                        "value": "@add(variables('AzCurrentWeight'), variables('WeightChangeValue'))"
+                                    }
+                                },
+                                "SetOnPremEndpointUpdatedWeight": {
+                                    "runAfter": {},
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "OnPremUpdatedWeight",
+                                        "value": "@sub(variables('OnPremCurrentWeight'), variables('WeightChangeValue'))"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "SetAzureEndpointCurrentWeight": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "else": {
+                                "actions": {
+                                    "Set_variable_3": {
+                                        "runAfter": {},
+                                        "type": "SetVariable",
+                                        "inputs": {
+                                            "name": "OnPremUpdatedWeight",
+                                            "value": "@add(variables('OnPremCurrentWeight'), variables('WeightChangeValue'))"
+                                        }
+                                    },
+                                    "Set_variable_4": {
+                                        "runAfter": {
+                                            "Set_variable_3": [
+                                                "Succeeded"
+                                            ]
+                                        },
+                                        "type": "SetVariable",
+                                        "inputs": {
+                                            "name": "AzureUpdatedWeight",
+                                            "value": "@sub(variables('AzCurrentWeight'), variables('WeightChangeValue'))"
+                                        }
+                                    }
+                                }
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "equals": [
+                                            "@triggerBody()?['body']?['data']?['customProperties']?['isScaleOut']",
+                                            "true"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "type": "If"
+                        },
+                        "Create_or_update_a_resource": {
+                            "runAfter": {
+                                "Condition": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "location": "Global",
+                                    "properties": {
+                                        "dnsConfig": {
+                                            "fqdn": "cloudburstgblloadbalancer01.trafficmanager.net",
+                                            "relativeName": "cloudburstgblloadbalancer01",
+                                            "ttl": 30
+                                        },
+                                        "endpoints": [
+                                            {
+                                                "id": "[concat(parameters('trafficManagerProfile_id'), '/azureEndpoints/reg1s1appscaleset')]",
+                                                "name": "reg1s1appscaleset",
+                                                "properties": {
+                                                    "endpointLocation": "East US",
+                                                    "endpointMonitorStatus": "Enabled",
+                                                    "endpointStatus": "Enabled",
+                                                    "minChildEndpoints": null,
+                                                    "priority": 1,
+                                                    "target": "reg1s1appscaleset.eastus.cloudapp.azure.com",
+                                                    "targetResourceId": "[parameters('primaryRegionpip_id')]",
+                                                    "weight": "@variables('OnPremUpdatedWeight')"
+                                                },
+                                                "type": "Microsoft.Network/trafficManagerProfiles/azureEndpoints"
+                                            },
+                                            {
+                                                "id": "[concat(parameters('trafficManagerProfile_id'), '/azureEndpoints/reg2s1appscaleset')]",
+                                                "name": "reg2s1appscaleset",
+                                                "properties": {
+                                                    "endpointLocation": "West US",
+                                                    "endpointMonitorStatus": "Degraded",
+                                                    "endpointStatus": "Enabled",
+                                                    "minChildEndpoints": null,
+                                                    "priority": 2,
+                                                    "target": "reg2s1appscaleset.westus.cloudapp.azure.com",
+                                                    "targetResourceId": "[parameters('secondaryRegionpip_id')]",
+                                                    "weight": "@variables('AzureUpdatedWeight')"
+                                                },
+                                                "type": "Microsoft.Network/trafficManagerProfiles/azureEndpoints"
+                                            }
+                                        ],
+                                        "location": "global",
+                                        "maxReturn": null,
+                                        "monitorConfig": {
+                                            "intervalInSeconds": 30,
+                                            "path": "/",
+                                            "port": 80,
+                                            "profileMonitorStatus": "Degraded",
+                                            "protocol": "HTTP",
+                                            "timeoutInSeconds": 10,
+                                            "toleratedNumberOfFailures": 3
+                                        },
+                                        "profileStatus": "Enabled",
+                                        "trafficRoutingMethod": "Weighted",
+                                        "trafficViewEnrollmentStatus": "Disabled"
+                                    }
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['arm_1']['connectionId']"
+                                    }
+                                },
+                                "method": "put",
+                                "path": "[parameters('__encodeURIComponent__trafficmanagerprofiles____externalid')]",
+                                "queries": {
+                                    "x-ms-api-version": "2018-08-01"
+                                }
+                            }
+                        },
+                        "GetAzureEndpoint": {
+                            "runAfter": {
+                                "GetOnpremEndpoint": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Query",
+                            "inputs": {
+                                "from": "@body('Parse_JSON')?['endpoints']",
+                                "where": "@equals(item()?['name'], 'reg2s1appscaleset')"
+                            }
+                        },
+                        "GetOnpremEndpoint": {
+                            "runAfter": {
+                                "Parse_JSON": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Query",
+                            "inputs": {
+                                "from": "@body('Parse_JSON')?['endpoints']",
+                                "where": "@equals(item()?['name'], 'reg1s1appscaleset')"
+                            }
+                        },
+                        "Initialize_Azure_Weight_Variable": {
+                            "runAfter": {
+                                "Initialize_OnPremWeight_Variable": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "AzCurrentWeight",
+                                        "type": "integer"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_Change_Weight_Value": {
+                            "runAfter": {
+                                "Initialize_variable_2": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "WeightChangeValue",
+                                        "type": "integer",
+                                        "value": 15
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_OnPremWeight_Variable": {
+                            "runAfter": {},
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "OnPremCurrentWeight",
+                                        "type": "integer"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_variable": {
+                            "runAfter": {
+                                "Initialize_Azure_Weight_Variable": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "OnPremUpdatedWeight",
+                                        "type": "integer"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_variable_2": {
+                            "runAfter": {
+                                "Initialize_variable": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "AzureUpdatedWeight",
+                                        "type": "integer"
+                                    }
+                                ]
+                            }
+                        },
+                        "Parse_JSON": {
+                            "runAfter": {
+                                "Read_a_resource": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('Read_a_resource')?['properties']",
+                                "schema": {
+                                    "properties": {
+                                        "dnsConfig": {
+                                            "properties": {
+                                                "fqdn": {
+                                                    "type": "string"
+                                                },
+                                                "relativeName": {
+                                                    "type": "string"
+                                                },
+                                                "ttl": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "endpoints": {
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "properties": {
+                                                        "properties": {
+                                                            "endpointLocation": {
+                                                                "type": "string"
+                                                            },
+                                                            "endpointMonitorStatus": {
+                                                                "type": "string"
+                                                            },
+                                                            "endpointStatus": {
+                                                                "type": "string"
+                                                            },
+                                                            "minChildEndpoints": {},
+                                                            "priority": {
+                                                                "type": "integer"
+                                                            },
+                                                            "target": {
+                                                                "type": "string"
+                                                            },
+                                                            "targetResourceId": {
+                                                                "type": "string"
+                                                            },
+                                                            "weight": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "type": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "properties",
+                                                    "type"
+                                                ],
+                                                "type": "object"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "maxReturn": {},
+                                        "monitorConfig": {
+                                            "properties": {
+                                                "intervalInSeconds": {
+                                                    "type": "integer"
+                                                },
+                                                "path": {
+                                                    "type": "string"
+                                                },
+                                                "port": {
+                                                    "type": "integer"
+                                                },
+                                                "profileMonitorStatus": {
+                                                    "type": "string"
+                                                },
+                                                "protocol": {
+                                                    "type": "string"
+                                                },
+                                                "timeoutInSeconds": {
+                                                    "type": "integer"
+                                                },
+                                                "toleratedNumberOfFailures": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "profileStatus": {
+                                            "type": "string"
+                                        },
+                                        "trafficRoutingMethod": {
+                                            "type": "string"
+                                        },
+                                        "trafficViewEnrollmentStatus": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "Read_a_resource": {
+                            "runAfter": {
+                                "Initialize_Change_Weight_Value": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['arm_1']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "[parameters('__encodeURIComponent__trafficmanagerprofiles____externalid')]",
+                                "queries": {
+                                    "x-ms-api-version": "2018-08-01"
+                                }
+                            }
+                        },
+                        "SetAzureEndpointCurrentWeight": {
+                            "foreach": "@body('GetAzureEndpoint')",
+                            "actions": {
+                                "Set_variable_2": {
+                                    "runAfter": {},
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "AzCurrentWeight",
+                                        "value": "@items('SetAzureEndpointCurrentWeight')?['properties']?['weight']"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "SetOnpremEndpointCurrentWeight": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Foreach"
+                        },
+                        "SetOnpremEndpointCurrentWeight": {
+                            "foreach": "@body('GetOnpremEndpoint')",
+                            "actions": {
+                                "Set_variable": {
+                                    "runAfter": {},
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "OnPremCurrentWeight",
+                                        "value": "@items('SetOnpremEndpointCurrentWeight')?['properties']?['weight']"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "GetAzureEndpoint": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Foreach"
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "arm_1": {
+                                "connectionId": "[parameters('connections_arm_1_connectionId')]",
+                                "connectionName": "[parameters('connections_arm_name')]",
+                                "id": "[parameters('connections_arm_id')]"
+                                //"/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/providers/Microsoft.Web/locations/westus/managedApis/arm"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

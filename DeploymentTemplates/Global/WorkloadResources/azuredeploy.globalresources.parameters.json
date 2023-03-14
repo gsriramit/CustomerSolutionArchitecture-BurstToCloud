@@ -2,33 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "subscriptionId": {
-      "value": "695471ea-1fc3-42ee-a854-eab6c3009516"
-    },
-    "onpremRgName": {
-      "value": "rg-r1stamp1-workload-dev01"
-    },
-    "azureWorkloadRgName": {
-      "value": "rg-r2stamp2-workload-dev02"
-    },
-    "uniqueDnsName": {
-      "value": "cloudburstgblloadbalancer01"
-    },
-    "uniqueDnsNameForOnpremWebApp": {
-      "value": "reg1s1appscaleset"
-    },
-    "uniqueDnsNameForAzureWebApp": {
-      "value": "reg2s1appscaleset"
-    },
-    "trafficManagerName": {
-      "value": "globallb-dev01"
-    },
-    "onpremEndpointPublicIpName": {
-      "value": "primaryappip"
-    },
-    "azureEndpointPublicIpName": {
-      "value": "secondarypip"
-    },
     "appType": {
       "value": "web"
     },

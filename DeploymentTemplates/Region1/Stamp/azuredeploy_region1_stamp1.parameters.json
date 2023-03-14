@@ -2,6 +2,9 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "resourcegroupName": {
+      "value": "rg-r1stamp1-workload-dev01"
+    },
     "vmssName": {
       "value": "reg1s1appscaleset"
     },
@@ -29,8 +32,19 @@
     "sqlAdministratorLoginPassword": {
       "value": "Adminpwd#789"
     },
-    "stateDBName":{
-      "value":"svc-Todo-primaryDb"
+    "stateDBName": {
+      "value": "svc-Todo-primaryDb"
+    },
+    "privateLinkResource": {
+      "value": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r1stamp1-workload-dev01/providers/Microsoft.Sql/servers/bursttocloud"
+    },
+    "targetSubResource": {
+      "value": [
+        "sqlServer"
+      ]
+    },
+    "privateEndpointName": {
+      "value": "pv-sqldb-burstapp"
     }
   }
 }

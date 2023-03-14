@@ -23,6 +23,11 @@ New-AzResourceGroup -Location $region2_location -Name $region2_rg_stamp1
 New-AzResourceGroup -Location $region2_location -Name $region2_rg_monitoring
 New-AzResourceGroup -Location $global_rg_location -Name $global_rg_Name
 
+## Deploy global resources - LA Workspace, Application Insights (for the monitoring of logic app) and Private DNS zone for SQL ##
+New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $global_rg_Name `
+-TemplateFile "..\DeploymentTemplates\Global\WorkloadResources\azuredeploy.globalresources.json" `
+-TemplateParameterFile "..\DeploymentTemplates\Global\WorkloadResources\azuredeploy.globalresources.parameters.json"
+
 ## Deploy regional resources ##
 # Region#1
 # Deploy the stamp resources 
@@ -60,11 +65,16 @@ Add-AzVirtualNetworkPeering -Name 'LinkOnPremiseToAzure' -VirtualNetwork $vnet1 
 Add-AzVirtualNetworkPeering -Name 'LinkAzureToOnPremise' -VirtualNetwork $vnet2 -RemoteVirtualNetworkId $vnet1.Id
 
 ## Deploy global resources ##
-# Deploy Traffic Manager, Log Analytics workspace & Logic app
+# Deploy Traffic Manager
 New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $global_rg_Name `
--TemplateFile "..\DeploymentTemplates\Global\WorkloadResources\azuredeploy.globalresources.json" `
--TemplateParameterFile "..\DeploymentTemplates\Global\WorkloadResources\azuredeploy.globalresources.parameters.json"
+-TemplateFile "..\DeploymentTemplates\Global\WorkloadResources\azuredeploy.dependentglobalresources.json" `
+-TemplateParameterFile "..\DeploymentTemplates\Global\WorkloadResources\azuredeploy.dependentglobalresources.parameters.json"
+
 # Deploy the autoscale settings 
 New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $global_rg_Name `
 -TemplateFile "..\DeploymentTemplates\Global\Automation\azuredeploy.autoscaleconfig.json" `
 -TemplateParameterFile "..\DeploymentTemplates\Global\Automation\azuredeploy.autoscaleconfig.parameters.json"
+
+# Deploy the logic app that does the traffic management
+New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $global_rg_Name `
+-TemplateFile "..\DeploymentTemplates\Global\Automation\azuredeploy.trafficMgmtLogicApp.json" 

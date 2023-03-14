@@ -9,6 +9,13 @@
     }
   },
   "parameters": {
+    "resourcegroupName": {
+      "type": "string"
+    },
+    "globalresourceGroupName":{
+      "type":"string",
+      "defaultValue":"rg-global-dev01"
+    },
     "vmssName": {
       "type": "string",
       "maxLength": 61,
@@ -123,7 +130,17 @@
     "sqlAdministratorLoginPassword": {
       "type": "String"
     },
-    "stateDBName":{
+    "stateDBName": {
+      "type": "string"
+    },
+    "privateLinkResource": {
+      "type": "string",
+      "defaultValue": "[concat(subscription().id,'/resourceGroups/', parameters('resourcegroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlserver_name'))]"
+    },
+    "targetSubResource": {
+      "type": "array"
+    },
+    "privateEndpointName": {
       "type": "string"
     }
   },
@@ -139,7 +156,7 @@
     "publicIPAddressName": "[format('{0}pip', variables('vmScaleSetName'))]",
     "webSubnetName": "[format('{0}subnet', variables('vmScaleSetName'))]",
     "bastionSubnetName": "AzureBastionSubnet",
-    "privatendpointSubnetName":"subnet-pvtendpoints",
+    "privatendpointSubnetName": "subnet-pvtendpoints",
     "loadBalancerName": "[format('{0}lb', variables('vmScaleSetName'))]",
     "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
     "lbProbeID": "[resourceId('Microsoft.Network/loadBalancers/probes', variables('loadBalancerName'), 'tcpProbe')]",
@@ -152,16 +169,13 @@
     "nicName": "[format('{0}nic', variables('vmScaleSetName'))]",
     "ipConfigName": "[format('{0}ipconfig', variables('vmScaleSetName'))]",
     "frontEndIPConfigID": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', variables('loadBalancerName'), 'loadBalancerFrontEnd')]",
-    "osType": {
-      "publisher": "MicrosoftWindowsServer",
-      "offer": "WindowsServer",
-      "sku": "[parameters('windowsOSVersion')]",
-      "version": "latest"
-    },
     "baseimageName": "vm-basewebserver-img_eastus_v1.0",
     "imageReference": "[concat(subscription().id,'/resourceGroups/rg-global-dev01/providers/Microsoft.Compute/images/', variables('baseimageName'))]", /*"[variables('osType')]",*/
     "webDeployPackageFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('webDeployPackage'), parameters('_artifactsLocationSasToken')))]",
-    "powershelldscZipFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('powershelldscZip'), parameters('_artifactsLocationSasToken')))]"
+    "powershelldscZipFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('powershelldscZip'), parameters('_artifactsLocationSasToken')))]",
+    "virtualNetworkId": "[concat(subscription().id,'/resourceGroups/', parameters('resourcegroupName'),'/providers/Microsoft.Network/virtualNetworks/',variables('vNetName'))]",
+    "privateendpointSubnetId":"[concat(subscription().id,'/resourceGroups/', parameters('resourcegroupName'),'/providers/Microsoft.Network/virtualNetworks/',variables('vNetName'),'/subnets/',variables('privatendpointSubnetName'))]"
+
   },
   "resources": [
     {
@@ -396,7 +410,7 @@
       "apiVersion": "2021-05-01",
       "name": "[variables('vNetName')]",
       "location": "[parameters('location')]",
-       "dependsOn": [
+      "dependsOn": [
         "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup'))]"
       ],
       "properties": {
@@ -415,7 +429,7 @@
               }
             }
           },
-          {          
+          {
             "name": "[variables('bastionSubnetName')]",
             "properties": {
               "addressPrefix": "[variables('bastionSubnetPrefix')]",
@@ -424,7 +438,7 @@
               "privateLinkServiceNetworkPolicies": "Enabled"
             }
           },
-          {          
+          {
             "name": "[variables('privatendpointSubnetName')]",
             "properties": {
               "addressPrefix": "[variables('privatendpointSubnetPrefix')]",
@@ -437,62 +451,119 @@
       }
     },
     {
-            "type": "Microsoft.Sql/servers",
-            "apiVersion": "2022-05-01-preview",
-            "name": "[parameters('sqlserver_name')]",
-            "location": "eastus",
-            "tags": {
-                "displayName": "SqlServer"
-            },
-            "kind": "v12.0",
-            "properties": {
-                "administratorLogin": "sqladmin",
-                "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
-                "version": "12.0",
-                "publicNetworkAccess": "Enabled",
-                "restrictOutboundNetworkAccess": "Disabled"
-            }
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "apiVersion": "2018-09-01",
+      "name": "[concat('privatelink.database.windows.net', '/', uniqueString(variables('virtualNetworkId')))]",
+      "location": "global",
+      "properties": {
+        "virtualNetwork": {
+          "id": "[variables('virtualNetworkId')]"
         },
-        {
-            "type": "Microsoft.Sql/servers/databases",
-            "apiVersion": "2022-05-01-preview",
-            "name": "[concat(parameters('sqlserver_name'), '/',parameters('stateDBName'))]",
-            "location": "eastus",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('sqlserver_name'))]"
-            ],
-            "tags": {
-                "displayName": "Database"
-            },
-            "sku": {
-                "name": "BC_Gen5",
-                "tier": "BusinessCritical",
-                "family": "Gen5",
-                "capacity": 2
-            },
-            "kind": "v12.0,user,vcore,serverless",
-            "properties": {
-                "collation": "SQL_Latin1_General_CP1_CI_AS",
-                "maxSizeBytes": 10737418240,
-                "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
-                "zoneRedundant": false,
-                "readScale": "Disabled",
-                "autoPauseDelay": 60,
-                "requestedBackupStorageRedundancy": "Local"
-            }
+        "registrationEnabled": false
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2022-05-01-preview",
+      "name": "[parameters('sqlserver_name')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "displayName": "SqlServer"
+      },
+      "kind": "v12.0",
+      "properties": {
+        "administratorLogin": "sqladmin",
+        "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
+        "version": "12.0",
+        "publicNetworkAccess": "Enabled",
+        "restrictOutboundNetworkAccess": "Disabled"
+      }
+    },
+    {      
+      "type": "Microsoft.Network/privateEndpoints",
+      "location": "[parameters('location')]",
+      "name": "[parameters('privateEndpointName')]",
+      "apiVersion": "2021-05-01",
+      "properties": {
+        "subnet": {
+          "id": "[variables('privateendpointSubnetId')]"
         },
-        {
-            "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
-            "apiVersion": "2022-05-01-preview",
-            "name": "[concat(parameters('sqlserver_name'), '/',parameters('stateDBName'),'/Current')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlserver_name'), parameters('stateDBName'))]",
-                "[resourceId('Microsoft.Sql/servers', parameters('sqlserver_name'))]"
-            ],
+        "customNetworkInterfaceName": "pv-sqldb-burstapp-nic",
+        "privateLinkServiceConnections": [
+          {
+            "name": "[parameters('privateEndpointName')]",
             "properties": {
-                "state": "Enabled"
+              "privateLinkServiceId": "[parameters('privateLinkResource')]",
+              "groupIds": "[parameters('targetSubResource')]"
             }
-        }
+          }
+        ]
+      },
+      "tags": {},
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
+        "[resourceId('Microsoft.Sql/servers', parameters('sqlserver_name'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+      "apiVersion": "2021-05-01",
+      "name": "[concat(parameters('privateEndpointName'), '/', 'default')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "privateDnsZoneConfigs": [
+          {
+            "name": "privatelink-database-windows-net",
+            "properties": {
+              "privateDnsZoneId": "[concat(subscription().id,'/resourceGroups/', parameters('globalresourceGroupName'),'/providers/Microsoft.Network/privateDnsZones/privatelink.database.windows.net')]"
+            }
+          }
+        ]
+      },
+       "dependsOn": [
+        "[resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpointName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases",
+      "apiVersion": "2022-05-01-preview",
+      "name": "[concat(parameters('sqlserver_name'), '/',parameters('stateDBName'))]",
+      "location": "eastus",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', parameters('sqlserver_name'))]"
+      ],
+      "tags": {
+        "displayName": "Database"
+      },
+      "sku": {
+        "name": "BC_Gen5",
+        "tier": "BusinessCritical",
+        "family": "Gen5",
+        "capacity": 2
+      },
+      "kind": "v12.0,user,vcore,serverless",
+      "properties": {
+        "collation": "SQL_Latin1_General_CP1_CI_AS",
+        "maxSizeBytes": 10737418240,
+        "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+        "zoneRedundant": false,
+        "readScale": "Disabled",
+        "autoPauseDelay": 60,
+        "requestedBackupStorageRedundancy": "Local"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+      "apiVersion": "2022-05-01-preview",
+      "name": "[concat(parameters('sqlserver_name'), '/',parameters('stateDBName'),'/Current')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlserver_name'), parameters('stateDBName'))]",
+        "[resourceId('Microsoft.Sql/servers', parameters('sqlserver_name'))]"
+      ],
+      "properties": {
+        "state": "Enabled"
+      }
+    }
   ],
   "outputs": {
     "applicationUrl": {
