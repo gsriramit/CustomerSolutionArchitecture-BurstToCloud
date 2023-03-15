@@ -21,7 +21,7 @@
         "value": "web"
       },
       "appInsightsName": {
-        "value": "r2appanalytics-01"
+        "value": "r1appanalytics-01"
       },
       "insightsRegionId": {
         "value": "eastus"

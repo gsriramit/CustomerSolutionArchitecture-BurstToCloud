@@ -66,7 +66,28 @@
       "metadata": {
         "description": "name of the public ip attached to the external load balancer in the azure environment"
       }
+    },
+    "r1stamp1VnetName": {
+      "type": "string",
+      "defaultValue":"primaryapvnet"
+    },
+     "r2stamp1VnetName": {
+      "type": "string",
+      "defaultValue":"secondaryvnet"
+    },
+    "r1stamp1ResourceGroupName": {
+      "type": "string",
+      "defaultValue":"primaryapvnet"
+    },
+     "r2stamp1ResourceGroupName": {
+      "type": "string",
+      "defaultValue":"secondaryvnet"
     }
+
+  },
+  "variables":{
+    "region1VirtualNetworkId": "[concat(subscription().id,'/resourceGroups/', parameters('r1stamp1ResourceGroupName'),'/providers/Microsoft.Network/virtualNetworks/',parameters('r1stamp1VnetName'))]",
+    "region2VirtualNetworkId": "[concat(subscription().id,'/resourceGroups/', parameters('r2stamp1ResourceGroupName'),'/providers/Microsoft.Network/virtualNetworks/',parameters('r2stamp1VnetName'))]"
   },
   "resources": [
     {
@@ -109,6 +130,30 @@
             }
           }
         ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "apiVersion": "2018-09-01",
+      "name": "[concat('privatelink.database.windows.net', '/', uniqueString(variables('region1VirtualNetworkId')))]",
+      "location": "global",
+      "properties": {
+        "virtualNetwork": {
+          "id": "[variables('region1VirtualNetworkId')]"
+        },
+        "registrationEnabled": false
+      }
+    },
+    {
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "apiVersion": "2018-09-01",
+      "name": "[concat('privatelink.database.windows.net', '/', uniqueString(variables('region2VirtualNetworkId')))]",
+      "location": "global",
+      "properties": {
+        "virtualNetwork": {
+          "id": "[variables('region2VirtualNetworkId')]"
+        },
+        "registrationEnabled": false
       }
     }
   ]

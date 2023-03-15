@@ -18,13 +18,24 @@
       "value": "https://stawebserverdeploy01.blob.core.windows.net/"
     },
     "_artifactsLocationSasToken":{
-      "value": "?sv=2021-06-08&ss=b&srt=sco&sp=rlitx&se=2023-03-10T14:18:23Z&st=2023-02-20T06:18:23Z&spr=https,http&sig=JUcCz0ry%2BSY689HASy3ZvgjmS2rBxKIVcfv3cm9nYtI%3D"
+      "value": "?sv=2021-12-02&ss=b&srt=sco&sp=rltf&se=2023-04-14T16:22:32Z&st=2023-03-15T08:22:32Z&spr=https,http&sig=cVZadLj8B2j59%2BmJIYJRHo41%2FzBtJxi7mCa1b6yAR5I%3D"
     },
     "sqlserver_name": {
       "value": "sqlserver-reg2st1-dev01"
     },
     "sqlAdministratorLoginPassword": {
       "value": "Adminpwd#789"
+    },
+    "privateLinkResource": {
+      "value": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r2stamp2-workload-dev02/providers/Microsoft.Sql/servers/sqlserver-reg2st1-dev01"
+    },
+    "targetSubResource": {
+      "value": [
+        "sqlServer"
+      ]
+    },
+    "privateEndpointName": {
+      "value": "pv-sqldb-burstapp-sec"
     }
   }
 }

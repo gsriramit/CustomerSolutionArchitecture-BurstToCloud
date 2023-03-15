@@ -122,6 +122,20 @@
     },
     "sqlAdministratorLoginPassword": {
       "type": "String"
+    },
+    "privateLinkResource": {
+      "type": "string",
+      "defaultValue": "[concat(subscription().id,'/resourceGroups/', resourceGroup().name,'/providers/Microsoft.Sql/servers/',parameters('sqlserver_name'))]"
+    },
+    "targetSubResource": {
+      "type": "array"
+    },
+    "privateEndpointName": {
+      "type": "string"
+    },
+    "globalresourceGroupName": {
+      "type": "string",
+      "defaultValue": "rg-global-dev01"
     }
   },
   "variables": {
@@ -131,12 +145,12 @@
     "addressPrefix": "10.10.0.0/16",
     "webSubnetPrefix": "10.10.1.0/24",
     "bastionSubnetPrefix": "10.10.2.0/26",
-    "privatendpointSubnetPrefix": "10.10.2.0/26",
+    "privatendpointSubnetPrefix": "10.10.3.0/26",
     "vNetName": "[format('{0}vnet', variables('vmScaleSetName'))]",
     "publicIPAddressName": "[format('{0}pip', variables('vmScaleSetName'))]",
     "webSubnetName": "[format('{0}subnet', variables('vmScaleSetName'))]",
     "bastionSubnetName": "AzureBastionSubnet",
-    "privatendpointSubnetName":"subnet-pvtendpoints",
+    "privatendpointSubnetName": "subnet-pvtendpoints",
     "loadBalancerName": "[format('{0}lb', variables('vmScaleSetName'))]",
     "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
     "lbProbeID": "[resourceId('Microsoft.Network/loadBalancers/probes', variables('loadBalancerName'), 'tcpProbe')]",
@@ -158,7 +172,8 @@
     "baseimageName": "vm-basewebserver-img_v1.0",
     "imageReference": "[concat(subscription().id,'/resourceGroups/rg-global-dev01/providers/Microsoft.Compute/images/', variables('baseimageName'))]", /*"[variables('osType')]",*/
     "webDeployPackageFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('webDeployPackage'), parameters('_artifactsLocationSasToken')))]",
-    "powershelldscZipFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('powershelldscZip'), parameters('_artifactsLocationSasToken')))]"
+    "powershelldscZipFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('powershelldscZip'), parameters('_artifactsLocationSasToken')))]",
+    "privateendpointSubnetId": "[concat(subscription().id,'/resourceGroups/', resourceGroup().name,'/providers/Microsoft.Network/virtualNetworks/',variables('vNetName'),'/subnets/',variables('privatendpointSubnetName'))]"
   },
   "resources": [
     {
@@ -420,7 +435,7 @@
               "privateLinkServiceNetworkPolicies": "Enabled"
             }
           },
-          {          
+          {
             "name": "[variables('privatendpointSubnetName')]",
             "properties": {
               "addressPrefix": "[variables('privatendpointSubnetPrefix')]",
@@ -448,6 +463,51 @@
         "publicNetworkAccess": "Enabled",
         "restrictOutboundNetworkAccess": "Disabled"
       }
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints",
+      "location": "[parameters('location')]",
+      "name": "[parameters('privateEndpointName')]",
+      "apiVersion": "2021-05-01",
+      "properties": {
+        "subnet": {
+          "id": "[variables('privateendpointSubnetId')]"
+        },
+        "customNetworkInterfaceName": "pv-sqldb-burstapp-nic",
+        "privateLinkServiceConnections": [
+          {
+            "name": "[parameters('privateEndpointName')]",
+            "properties": {
+              "privateLinkServiceId": "[parameters('privateLinkResource')]",
+              "groupIds": "[parameters('targetSubResource')]"
+            }
+          }
+        ]
+      },
+      "tags": {},
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
+        "[resourceId('Microsoft.Sql/servers', parameters('sqlserver_name'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+      "apiVersion": "2021-05-01",
+      "name": "[concat(parameters('privateEndpointName'), '/', 'default')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "privateDnsZoneConfigs": [
+          {
+            "name": "privatelink-database-windows-net",
+            "properties": {
+              "privateDnsZoneId": "[concat(subscription().id,'/resourceGroups/', parameters('globalresourceGroupName'),'/providers/Microsoft.Network/privateDnsZones/privatelink.database.windows.net')]"
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpointName'))]"
+      ]
     }
   ],
   "outputs": {

@@ -173,7 +173,6 @@
     "imageReference": "[concat(subscription().id,'/resourceGroups/rg-global-dev01/providers/Microsoft.Compute/images/', variables('baseimageName'))]", /*"[variables('osType')]",*/
     "webDeployPackageFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('webDeployPackage'), parameters('_artifactsLocationSasToken')))]",
     "powershelldscZipFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('powershelldscZip'), parameters('_artifactsLocationSasToken')))]",
-    "virtualNetworkId": "[concat(subscription().id,'/resourceGroups/', parameters('resourcegroupName'),'/providers/Microsoft.Network/virtualNetworks/',variables('vNetName'))]",
     "privateendpointSubnetId":"[concat(subscription().id,'/resourceGroups/', parameters('resourcegroupName'),'/providers/Microsoft.Network/virtualNetworks/',variables('vNetName'),'/subnets/',variables('privatendpointSubnetName'))]"
 
   },
@@ -448,18 +447,6 @@
             }
           }
         ]
-      }
-    },
-    {
-      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
-      "apiVersion": "2018-09-01",
-      "name": "[concat('privatelink.database.windows.net', '/', uniqueString(variables('virtualNetworkId')))]",
-      "location": "global",
-      "properties": {
-        "virtualNetwork": {
-          "id": "[variables('virtualNetworkId')]"
-        },
-        "registrationEnabled": false
       }
     },
     {
