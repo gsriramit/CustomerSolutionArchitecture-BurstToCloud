@@ -194,7 +194,12 @@
               "publicIPAddress": {
                 "id": "[variables('publicIPAddressID')]"
               }
-            }
+            },
+            "zones": [
+              "1",
+              "2",
+              "3"
+            ]
           }
         ],
         "backendAddressPools": [
@@ -259,6 +264,11 @@
       "apiVersion": "2021-11-01",
       "name": "[variables('vmScaleSetName')]",
       "location": "[parameters('location')]",
+      "zones": [
+        "1",
+        "2",
+        "3"
+      ],
       "sku": {
         "name": "[parameters('vmSku')]",
         "tier": "Standard",
