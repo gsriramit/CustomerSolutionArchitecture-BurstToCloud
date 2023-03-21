@@ -44,8 +44,6 @@ New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $region1_rg_sta
 # To-Do: DELETE THIS ***Create the VNET link between the workload VNET and privatelink.database.windows.net private DNS zone
 #$Link = New-AzPrivateDnsVirtualNetworkLink -ZoneName $databasePrivateDNSZone -ResourceGroupName $global_rg_Name -Name "r1stamp1-link-database" -VirtualNetworkId "/subscriptions/$subscriptionId/resourceGroups/$region1_rg_stamp1/providers/Microsoft.Network/virtualNetworks/primaryapvnet" -EnableRegistration
 
-
-
 # Region#2
 # Deploy the monitoring resources
 New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $region2_rg_monitoring `
@@ -57,10 +55,6 @@ New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $region2_rg_sta
 -TemplateParameterFile "..\DeploymentTemplates\Region2\Stamp\azuredeploy_region2_stamp1.parameters.json"
 
 
-# Add the geo-replica of the database in the on-premise stamp
-$database = Get-AzSqlDatabase -DatabaseName $databasename -ResourceGroupName $region1_rg_stamp1 -ServerName $primaryServerName
-$database | New-AzSqlDatabaseSecondary -PartnerResourceGroupName $region2_rg_stamp1 -PartnerServerName $secondaryServerName -AllowConnections "All"
-
 # add the peering between the networks
 # Get a reference to the on-premise virtual network.
 $vnet1 = Get-AzVirtualNetwork -ResourceGroupName $region1_rg_stamp1 -Name 'primaryapvnet'
@@ -70,6 +64,14 @@ $vnet2 = Get-AzVirtualNetwork -ResourceGroupName $region2_rg_stamp1 -Name 'secon
 Add-AzVirtualNetworkPeering -Name 'LinkOnPremiseToAzure' -VirtualNetwork $vnet1 -RemoteVirtualNetworkId $vnet2.Id
 # Peer VNet2 to VNet1.
 Add-AzVirtualNetworkPeering -Name 'LinkAzureToOnPremise' -VirtualNetwork $vnet2 -RemoteVirtualNetworkId $vnet1.Id
+
+# Install the Azure sql module if it does not exist
+Install-Module Az.Sql
+
+# Add the geo-replica of the database in the on-premise stamp
+$database = Get-AzSqlDatabase -DatabaseName $databasename -ResourceGroupName $region1_rg_stamp1 -ServerName $primaryServerName
+$database | New-AzSqlDatabaseSecondary -PartnerResourceGroupName $region2_rg_stamp1 -PartnerServerName $secondaryServerName -AllowConnections "All"
+
 
 ## Deploy global resources ##
 # Deploy Traffic Manager

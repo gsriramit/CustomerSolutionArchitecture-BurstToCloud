@@ -73,6 +73,27 @@
             "metadata": {
                 "description": "Azure Storage Uri of the custom script file e.g. https://test.blob.core.windows.net/scripts/test.ps1"
             }
+        },
+        "_artifactsLocation": {
+            "type": "string",
+            "defaultValue": "[deployment().properties.templateLink.uri]",
+            "metadata": {
+                "description": "The base URI where artifacts required by this template are located. For example, if stored on a public GitHub repo, you'd use the following URI: https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-vmss-windows-webapp-dsc-autoscale/."
+            }
+        },
+        "_artifactsLocationSasToken": {
+            "type": "secureString",
+            "defaultValue": "",
+            "metadata": {
+                "description": "The sasToken required to access _artifactsLocation.  If your artifacts are stored on a public repo or public storage account you can leave this blank."
+            }
+        },
+        "webDeployPackage": {
+            "type": "string",
+            "defaultValue": "webdeploy/cloudapp-01.zip",
+            "metadata": {
+                "description": "Location of the  of the WebDeploy package zip file relative to the URI specified in _artifactsLocation, i.e. WebDeploy/DefaultASPWebApp.v1.0.zip"
+            }
         }
     },
     "variables": {
@@ -80,7 +101,8 @@
         "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
         "vmExtensionName": "WebServerSetupExtension",
         "accountid": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('customScriptStorageAccountResourceGroup'),'/providers/','Microsoft.Storage/storageAccounts/', parameters('customScriptStorageAccountName'))]",
-        "commandToExecute": "[concat('powershell.exe -File', ' ', parameters('customScriptFileToRun'))]"
+        "webDeployPackageFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('webDeployPackage'), parameters('_artifactsLocationSasToken')))]",
+        "commandToExecute": "[concat('powershell.exe -File', ' ', parameters('customScriptFileToRun'),' ', parameters('_artifactsLocationSasToken'), ' ', parameters('webDeployPackage'))]"
     },
     "resources": [
         {

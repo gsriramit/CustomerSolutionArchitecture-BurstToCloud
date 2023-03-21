@@ -86,8 +86,8 @@
 
   },
   "variables":{
-    "region1VirtualNetworkId": "[concat(subscription().id,'/resourceGroups/', parameters('r1stamp1ResourceGroupName'),'/providers/Microsoft.Network/virtualNetworks/',parameters('r1stamp1VnetName'))]",
-    "region2VirtualNetworkId": "[concat(subscription().id,'/resourceGroups/', parameters('r2stamp1ResourceGroupName'),'/providers/Microsoft.Network/virtualNetworks/',parameters('r2stamp1VnetName'))]"
+    "region1VirtualNetworkId": "[concat(subscription().id,'/resourceGroups/', parameters('onpremRgName'),'/providers/Microsoft.Network/virtualNetworks/',parameters('r1stamp1VnetName'))]",
+    "region2VirtualNetworkId": "[concat(subscription().id,'/resourceGroups/', parameters('azureWorkloadRgName'),'/providers/Microsoft.Network/virtualNetworks/',parameters('r2stamp1VnetName'))]"
   },
   "resources": [
     {

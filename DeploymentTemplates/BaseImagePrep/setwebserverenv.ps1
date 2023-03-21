@@ -3,7 +3,10 @@
         Setup the prerequsites for a web server that rund the enterprise app
 #>
 
-Param ()
+Param ([string] $storageAccessToken,
+[string] $deploymentPackageName)
+
+#$WebDeployPackagePath = $Args[0]
 
 # Force use of TLS 1.2
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -41,4 +44,15 @@ Set-Location IIS:\Sites
 # Create a new site within IIS to host the application
 New-Item iis:\Sites\CloudAppSite -bindings @{protocol="http";bindingInformation=":8080:"} -physicalPath C:\inetpub\wwwroot\CloudApp
 
-
+## This portion of the script deploys the application to IIS
+# $Destination = "C:\WindowsAzure\WebApplication.zip"      
+# $deploymentPackageBasePath= "https://stawebserverdeploy01.blob.core.windows.net/"
+# $WebDeployPackagePath = $deploymentPackageBasePath + $deploymentPackageName
+# Web request to download the application deployment package
+# Invoke-WebRequest -Uri $WebDeployPackagePath -OutFile $Destination -Verbose
+# Get a reference to the path where the msdeploy.exe is located
+# $MSDeployPath = (Get-ChildItem "HKLM:\SOFTWARE\Microsoft\IIS Extensions\MSDeploy" | Select-Object -Last 1).GetValue("InstallPath")       
+# Set the current path to the where the msdeploy.exe is located
+# Set-Location $MSDeployPath
+# run the msdeploy command to deploy the app
+# .\msdeploy.exe -source:package="C:\WindowsAzure\WebApplication.zip" -dest:contentPath="CloudAppSite" -verb:sync

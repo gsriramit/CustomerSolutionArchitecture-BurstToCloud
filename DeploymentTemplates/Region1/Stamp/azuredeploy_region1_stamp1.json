@@ -169,8 +169,8 @@
     "nicName": "[format('{0}nic', variables('vmScaleSetName'))]",
     "ipConfigName": "[format('{0}ipconfig', variables('vmScaleSetName'))]",
     "frontEndIPConfigID": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', variables('loadBalancerName'), 'loadBalancerFrontEnd')]",
-    "baseimageName": "vm-basewebserver-img_eastus_v1.0",
-    "imageReference": "[concat(subscription().id,'/resourceGroups/rg-global-dev01/providers/Microsoft.Compute/images/', variables('baseimageName'))]", /*"[variables('osType')]",*/
+    "baseimageName": "vm-basewebserver-img_eastus_v1.1",
+    "imageReference": "[concat(resourceGroup().id,'/providers/Microsoft.Compute/images/', variables('baseimageName'))]", /*"[variables('osType')]",*/
     "webDeployPackageFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('webDeployPackage'), parameters('_artifactsLocationSasToken')))]",
     "powershelldscZipFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('powershelldscZip'), parameters('_artifactsLocationSasToken')))]",
     "privateendpointSubnetId":"[concat(subscription().id,'/resourceGroups/', parameters('resourcegroupName'),'/providers/Microsoft.Network/virtualNetworks/',variables('vNetName'),'/subnets/',variables('privatendpointSubnetName'))]"
@@ -194,12 +194,12 @@
               "publicIPAddress": {
                 "id": "[variables('publicIPAddressID')]"
               }
-            },
+            }/*,
             "zones": [
               "1",
               "2",
               "3"
-            ]
+            ]*/
           }
         ],
         "backendAddressPools": [
@@ -249,8 +249,8 @@
               "protocol": "Tcp",
               "port": 8080,
               "intervalInSeconds": 5,
-              "numberOfProbes": 2,
-              "probeThreshold": 1
+              "numberOfProbes": 2
+              //"probeThreshold": 1
             }
           }
         ]
@@ -264,11 +264,11 @@
       "apiVersion": "2021-11-01",
       "name": "[variables('vmScaleSetName')]",
       "location": "[parameters('location')]",
-      "zones": [
+      /*"zones": [
         "1",
         "2",
         "3"
-      ],
+      ],*/
       "sku": {
         "name": "[parameters('vmSku')]",
         "tier": "Standard",
@@ -320,8 +320,8 @@
                 }
               }
             ]
-          },
-          "extensionProfile": {
+          }
+          /*"extensionProfile": {
             "extensions": [
               {
                 "name": "Microsoft.Powershell.DSC",
@@ -345,7 +345,7 @@
                 }
               }
             ]
-          }
+          }*/
         }
       },
       "dependsOn": [
