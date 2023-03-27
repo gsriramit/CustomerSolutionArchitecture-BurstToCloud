@@ -1,0 +1,51 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "actionGroups_name": {
+            "defaultValue": "ag-logicapp-bursttocloud",
+            "type": "String"
+        },
+        "logicapp_workflowName":{
+            "type": "string",
+            "defaultValue":"trafficmgmtapp-dev01"
+        },
+        "logicapp_workflow_id": {
+            "defaultValue": "[resourceId('Microsoft.Logic/workflows',parameters('logicapp_workflowName'))]",
+            //"/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-global-dev01/providers/Microsoft.Logic/workflows/la-bursttocloud",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "microsoft.insights/actionGroups",
+            "apiVersion": "2023-01-01",
+            "name": "[parameters('actionGroups_name')]",
+            "location": "Global",
+            "properties": {
+                "groupShortName": "bursttocloud",
+                "enabled": true,
+                "emailReceivers": [],
+                "smsReceivers": [],
+                "webhookReceivers": [],
+                "eventHubReceivers": [],
+                "itsmReceivers": [],
+                "azureAppPushReceivers": [],
+                "automationRunbookReceivers": [],
+                "voiceReceivers": [],
+                "logicAppReceivers": [
+                    {
+                        "name": "[parameters('logicapp_workflowName')]",
+                        "resourceId": "[parameters('logicapp_workflow_id')]",
+                        "callbackUrl":  "[listCallbackURL(concat(resourceId('Microsoft.Logic/workflows', parameters('logicapp_workflowName')), '/triggers/manual'), '2016-06-01').value]",
+                        //"https://prod-137.westus.logic.azure.com:443/workflows/893b4848bc6d40608ed2b9c801be1504/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=z7rR3_1kWetW0Xrg9vOL1xa7ABvD38NqQHxCYeRyoCw",
+                        "useCommonAlertSchema": true
+                    }
+                ],
+                "azureFunctionReceivers": [],
+                "armRoleReceivers": []
+            }
+        }
+    ]
+}

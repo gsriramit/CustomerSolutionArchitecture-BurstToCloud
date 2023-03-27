@@ -2,82 +2,82 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-         "autoscaleSettingName":{
-            "type":"string",
-            "metadata":{
+        "autoscaleSettingName": {
+            "type": "string",
+            "metadata": {
                 "description": "autoscale setting name"
             }
         },
-        "autoscaleResourceName":{
-            "type":"string",
-            "metadata":{
+        "autoscaleResourceName": {
+            "type": "string",
+            "metadata": {
                 "description": "autoscale resource name"
             }
         },
-        "targetResourceSubscriptionId":{
-            "type":"string",
-            "metadata":{
+        "targetResourceSubscriptionId": {
+            "type": "string",
+            "metadata": {
                 "description": "subscription Id where the target vmss exists"
             }
         },
-        "targetResourceRg":{
-            "type":"string",
-            "metadata":{
+        "targetResourceRg": {
+            "type": "string",
+            "metadata": {
                 "description": "resource group where the target vmss exists"
             }
         },
-        "targetResourceName":{
-            "type":"string",
-            "metadata":{
+        "targetResourceName": {
+            "type": "string",
+            "metadata": {
                 "description": "Name of the target vmss"
             }
         },
-        "onpremappInsightsResource":{
-            "type":"string",
-            "metadata":{
-                "description":"Name of the app insights resource on-premise, metrics from which would be used to configure this autoscale setting"
+        "onpremappInsightsResource": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the app insights resource on-premise, metrics from which would be used to configure this autoscale setting"
             }
         },
-        "onpremMonitoringRg":{
-            "type":"string",
-            "metadata":{
+        "onpremMonitoringRg": {
+            "type": "string",
+            "metadata": {
                 "description": "resource group where the on-premise application insight resource exists"
             }
         },
-        "azMonitoringRg":{
-            "type":"string",
-            "metadata":{
+        "azMonitoringRg": {
+            "type": "string",
+            "metadata": {
                 "description": "resource group where the azure application insight resource exists"
             }
         },
-        "azappInsightsResource":{
-            "type":"string",
-            "metadata":{
-                "description":"Name of the app insights resource, metrics from which would be used to configure this autoscale setting"
+        "azappInsightsResource": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the app insights resource, metrics from which would be used to configure this autoscale setting"
             }
         },
-        "scalingMinInstanceCount":{
-            "type":"string",
-            "metadata":{
-                "description":"Minimum number of instances in the scale set"
+        "scalingMinInstanceCount": {
+            "type": "string",
+            "metadata": {
+                "description": "Minimum number of instances in the scale set"
             }
         },
-        "scalingMaxInstanceCount":{
-            "type":"string",
-            "metadata":{
-                "description":"Maximum number of instances in the scale set"
+        "scalingMaxInstanceCount": {
+            "type": "string",
+            "metadata": {
+                "description": "Maximum number of instances in the scale set"
             }
         },
-        "scaleoutInstanceCount":{
-            "type":"string",
-            "metadata":{
-                "description":"Number of instances to add to the scale set when scaling out"
+        "scaleoutInstanceCount": {
+            "type": "string",
+            "metadata": {
+                "description": "Number of instances to add to the scale set when scaling out"
             }
         },
-         "scaleinInstanceCount":{
-            "type":"string",
-            "metadata":{
-                "description":"Number of instances to remove from the set when scaling in"
+        "scaleinInstanceCount": {
+            "type": "string",
+            "metadata": {
+                "description": "Number of instances to remove from the set when scaling in"
             }
         }
     },
@@ -95,7 +95,7 @@
                 "targetResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('targetResourceRg'),'/providers/Microsoft.Compute/virtualMachineScaleSets/',parameters('targetResourceName'))]",
                 "profiles": [
                     {
-                        "name": "Auto created default scale condition",
+                        "name": "Burst to Cloud scale condition",
                         "capacity": {
                             "minimum": "[parameters('scalingMinInstanceCount')]",
                             "maximum": "[parameters('scalingMaxInstanceCount')]",
@@ -110,12 +110,12 @@
                                     "cooldown": "PT3M"
                                 },
                                 "metricTrigger": {
-                                    "metricName": "requests/rate",
-                                    "metricNamespace": "microsoft.insights/components",
+                                    "metricName": "requests/count",
+                                    "metricNamespace": "microsoft.insights/components/kusto",
                                     "metricResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('onpremMonitoringRg'),'/providers/microsoft.insights/components/',parameters('onpremappInsightsResource'))]",
-                                    "operator": "GreaterThan",
-                                    "statistic": "Average",
-                                    "threshold": 600,
+                                    "operator": "GreaterThanOrEqual",
+                                    "statistic": "Sum",
+                                    "threshold": 100,
                                     "timeAggregation": "Average",
                                     "timeGrain": "PT1M",
                                     "timeWindow": "PT5M",
@@ -131,12 +131,12 @@
                                     "cooldown": "PT3M"
                                 },
                                 "metricTrigger": {
-                                    "metricName": "requests/rate",
-                                    "metricNamespace": "microsoft.insights/components",
+                                   "metricName": "requests/count",
+                                    "metricNamespace": "microsoft.insights/components/kusto",
                                     "metricResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('onpremMonitoringRg'),'/providers/microsoft.insights/components/',parameters('onpremappInsightsResource'))]",
-                                    "operator": "LessThan",
-                                    "statistic": "Average",
-                                    "threshold": 500,
+                                    "operator": "LessThanOrEqual",
+                                    "statistic": "Sum",
+                                    "threshold": 50,
                                     "timeAggregation": "Average",
                                     "timeGrain": "PT1M",
                                     "timeWindow": "PT5M",
@@ -152,12 +152,12 @@
                                     "cooldown": "PT3M"
                                 },
                                 "metricTrigger": {
-                                    "metricName": "requests/rate",
-                                    "metricNamespace": "microsoft.insights/components",
+                                    "metricName": "requests/count",
+                                    "metricNamespace": "microsoft.insights/components/kusto",
                                     "metricResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('azMonitoringRg'),'/providers/microsoft.insights/components/',parameters('azappInsightsResource'))]",
-                                    "operator": "GreaterThan",
-                                    "statistic": "Average",
-                                    "threshold": 1000,
+                                    "operator": "GreaterThanOrEqual",
+                                    "statistic": "Sum",
+                                    "threshold": 500,
                                     "timeAggregation": "Average",
                                     "timeGrain": "PT1M",
                                     "timeWindow": "PT5M",
@@ -173,12 +173,12 @@
                                     "cooldown": "PT3M"
                                 },
                                 "metricTrigger": {
-                                    "metricName": "requests/rate",
-                                    "metricNamespace": "microsoft.insights/components",
+                                    "metricName": "requests/count",
+                                    "metricNamespace": "microsoft.insights/components/kusto",
                                     "metricResourceUri": "[concat('/subscriptions/', parameters('targetResourceSubscriptionId'),'/resourceGroups/', parameters('azMonitoringRg'),'/providers/microsoft.insights/components/',parameters('azappInsightsResource'))]",
-                                    "operator": "LessThan",
-                                    "statistic": "Average",
-                                    "threshold": 700,
+                                    "operator": "LessThanOrQual",
+                                    "statistic": "Sum",
+                                    "threshold": 200,
                                     "timeAggregation": "Average",
                                     "timeGrain": "PT1M",
                                     "timeWindow": "PT5M",

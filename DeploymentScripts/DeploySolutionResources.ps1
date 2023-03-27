@@ -72,9 +72,17 @@ Install-Module Az.Sql
 $database = Get-AzSqlDatabase -DatabaseName $databasename -ResourceGroupName $region1_rg_stamp1 -ServerName $primaryServerName
 $database | New-AzSqlDatabaseSecondary -PartnerResourceGroupName $region2_rg_stamp1 -PartnerServerName $secondaryServerName -AllowConnections "All"
 
+### A very important step ###
+# the following sql script has to be run to create the ToDo table in the target database
+# CreateToDoTable.sql
+# options of running the script
+# a) from the SQL Query explorer window (Azure portal)
+# b) from SSMS after logging into any of the bastion hosts
+
+
 
 ## Deploy global resources ##
-# Deploy Traffic Manager
+# Deploy Traffic Manager and the Virtual Network to Private DNS Zone links from both the regions
 New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $global_rg_Name `
 -TemplateFile "..\DeploymentTemplates\Global\WorkloadResources\azuredeploy.dependentglobalresources.json" `
 -TemplateParameterFile "..\DeploymentTemplates\Global\WorkloadResources\azuredeploy.dependentglobalresources.parameters.json"
@@ -87,3 +95,11 @@ New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $global_rg_Name
 # Deploy the logic app that does the traffic management
 New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $global_rg_Name `
 -TemplateFile "..\DeploymentTemplates\Global\Automation\azuredeploy.trafficMgmtLogicApp.json" 
+
+# Create the action group that will get invoked from the alerts for cloud-burst and fallback are triggered
+New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $global_rg_Name `
+-TemplateFile "..\DeploymentTemplates\Global\Automation\azuredeploy.actiongroup.json" 
+
+# Create the application Insights Metric Alerts that will be triggered based on the configured request threshold conditions
+New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $global_rg_Name `
+-TemplateFile "..\DeploymentTemplates\Global\Automation\azuredeploy.metricalert.json" 

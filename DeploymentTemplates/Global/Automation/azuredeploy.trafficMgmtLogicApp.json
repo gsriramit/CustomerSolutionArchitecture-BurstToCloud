@@ -22,8 +22,8 @@
             "defaultValue": "/subscriptions/@{encodeURIComponent('695471ea-1fc3-42ee-a854-eab6c3009516')}/resourceGroups/@{encodeURIComponent('rg-global-dev01')}/providers/@{encodeURIComponent('Microsoft.Network')}/@{encodeURIComponent('trafficmanagerprofiles/globallb-dev01')}",
             "type": "String"
         },
-         "connections_arm_name": {
-            "defaultValue": "arm-2",
+        "connections_arm_name": {
+            "defaultValue": "arm",
             "type": "string",
             "metadata": {
                 "comment": "ARM connection name. Leave it as is."
@@ -34,7 +34,7 @@
             "type": "string"
         },
         "connections_arm_1_connectionId": {
-            "defaultValue": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-global-dev01/providers/Microsoft.Web/connections/arm-2",
+            "defaultValue": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-global-dev01/providers/Microsoft.Web/connections/arm",
             "type": "String"
         }
     },
@@ -59,6 +59,9 @@
             "apiVersion": "2017-07-01",
             "name": "[parameters('workflows_la_bursttocloud_name')]",
             "location": "westus",
+            "dependsOn":[
+                "[resourceId('Microsoft.Web/connections',parameters('connections_arm_name'))]"
+            ],
             "properties": {
                 "state": "Enabled",
                 "definition": {
@@ -325,11 +328,17 @@
                                 }
                             },
                             "expression": {
-                                "and": [
+                                "or": [
                                     {
                                         "equals": [
                                             "@triggerBody()?['body']?['data']?['customProperties']?['isScaleOut']",
                                             "true"
+                                        ]
+                                    },
+                                    {
+                                        "equals": [
+                                            "@triggerBody()?['body']?['data']?['customProperties']?['isScaleOut']",
+                                            true
                                         ]
                                     }
                                 ]
@@ -373,7 +382,7 @@
                                                 "name": "reg2s1appscaleset",
                                                 "properties": {
                                                     "endpointLocation": "West US",
-                                                    "endpointMonitorStatus": "Degraded",
+                                                    "endpointMonitorStatus": "Enabled",
                                                     "endpointStatus": "Enabled",
                                                     "minChildEndpoints": null,
                                                     "priority": 2,

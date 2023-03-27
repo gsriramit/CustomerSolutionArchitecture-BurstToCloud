@@ -1,0 +1,121 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "metricAlerts_burststart_name": {
+            "defaultValue": "alert-trafficlimitexceeded",
+            "type": "String"
+        },
+        "metricAlerts_burstend_name": {
+            "defaultValue": "alert-trafficspikesubsided",
+            "type": "String"
+        },
+        "stamp1_monitoring_rgname":{
+            "type": "string",
+            "defaultValue":"rg-r1monitoring-dev01"
+        },
+        "stamp1_appInsightsName":{
+            "type": "string",
+            "defaultValue":"r1appanalytics-01"
+        },
+        "appinsights_id": {
+            "defaultValue": "[concat(subscription().id,'/resourcegroups/',parameters('stamp1_monitoring_rgname'),'/providers/Microsoft.Insights/components/',parameters('stamp1_appInsightsName'))]",
+            //"/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r1monitoring-dev01/providers/Microsoft.Insights/components/r1appanalytics-01",
+            "type": "String"
+        },
+        "actionGroup_Name":{
+            "type": "string",
+            "defaultValue":"ag-logicapp-bursttocloud"
+        },
+        "actionGroup_id": {
+            "defaultValue": "[resourceId('microsoft.insights/actionGroups',parameters('actionGroup_Name'))]",
+            //"/subscriptions/695471EA-1FC3-42EE-A854-EAB6C3009516/resourceGroups/rg-monitoring-dev01/providers/microsoft.insights/actionGroups/ag-logicapp-bursttocloud",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_burststart_name')]",
+            "location": "global",
+            "properties": {
+                "description": "Traffic bursts to cloud beyond this threshold",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[parameters('appinsights_id')]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT5M",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": 200,
+                            "name": "Metric1",
+                            "metricNamespace": "microsoft.insights/components",
+                            "metricName": "requests/rate",
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Insights/components",
+                "targetResourceRegion": "eastus",
+                "actions": [
+                    {
+                        "actionGroupId": "[parameters('actionGroup_id')]",
+                        "webHookProperties": {
+                            "isScaleOut": "true"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_burstend_name')]",
+            "location": "global",
+            "properties": {
+                "description": "Traffic fallbacks to on-premise below this threshold",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[parameters('appinsights_id')]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT5M",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": 100,
+                            "name": "Metric1",
+                            "metricNamespace": "microsoft.insights/components",
+                            "metricName": "requests/rate",
+                            "operator": "LessThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Insights/components",
+                "targetResourceRegion": "eastus",
+                "actions": [
+                    {
+                        "actionGroupId": "[parameters('actionGroup_id')]",
+                        "webHookProperties": {
+                            "isScaleOut": "false"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

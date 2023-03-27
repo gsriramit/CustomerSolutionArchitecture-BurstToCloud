@@ -15,10 +15,10 @@
             "value":"rg-r2stamp2-workload-dev02"
         },
         "onpremMonitoringRg":{
-            "value": "rg-monitoring-dev01"
+            "value": "rg-r1monitoring-dev01"
         },
         "azMonitoringRg":{
-            "value":"rg-monitoring-dev02"
+            "value":"rg-r2monitoring-dev02"
         },
         "targetResourceName":{
             "value":"secondary"
