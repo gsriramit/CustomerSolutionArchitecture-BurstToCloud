@@ -76,7 +76,7 @@ $database | New-AzSqlDatabaseSecondary -PartnerResourceGroupName $region2_rg_sta
 # the following sql script has to be run to create the ToDo table in the target database
 # CreateToDoTable.sql
 # options of running the script
-# a) from the SQL Query explorer window (Azure portal)
+# a) from the SQL Query explorer window (Azure portal) (OR)
 # b) from SSMS after logging into any of the bastion hosts
 
 

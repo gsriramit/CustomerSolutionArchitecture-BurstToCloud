@@ -6,16 +6,39 @@
             "defaultValue": "trafficmgmtapp-dev01",
             "type": "String"
         },
+        "globalLoadbalancerName":{
+            "type": "string",
+            "defaultValue":"globallb-dev01"
+        },
+        "region1stamp1_rgName":{
+             "type": "string",
+            "defaultValue":"rg-r1stamp1-workload-dev01"
+        },
+         "region2stamp1_rgName":{
+             "type": "string",
+            "defaultValue":"rg-r2stamp2-workload-dev02"
+        },
         "trafficManagerProfile_id": {
-            "defaultValue": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-global-dev01/providers/Microsoft.Network/trafficManagerProfiles/globallb-dev01",
+            "defaultValue": "[resourceId('Microsoft.Network/trafficManagerProfiles',parameters('globalLoadbalancerName'))]",
+            //"/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-global-dev01/providers/Microsoft.Network/trafficManagerProfiles/globallb-dev01",
             "type": "String"
         },
+        "region1EndpointId":{
+            "type": "string",
+            "defaultValue":"primaryappip"
+        },
+        "region2EndpointId":{
+            "type": "string",
+            "defaultValue":"secondarypip"
+        },
         "primaryRegionpip_id": {
-            "defaultValue": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r1stamp1-workload-dev01/providers/Microsoft.Network/publicIPAddresses/primaryappip",
+            "defaultValue": "[concat(subscription().id,'/resourceGroups/',parameters('region1stamp1_rgName'),'/providers/Microsoft.Network/publicIPAddresses/',parameters('region1EndpointId'))]",
+            //"/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r1stamp1-workload-dev01/providers/Microsoft.Network/publicIPAddresses/primaryappip",
             "type": "String"
         },
         "secondaryRegionpip_id": {
-            "defaultValue": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r2stamp2-workload-dev02/providers/Microsoft.Network/publicIPAddresses/secondarypip",
+            "defaultValue": "[concat(subscription().id,'/resourceGroups/',parameters('region2stamp1_rgName'),'/providers/Microsoft.Network/publicIPAddresses/',parameters('region2EndpointId'))]",
+            //"/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r2stamp2-workload-dev02/providers/Microsoft.Network/publicIPAddresses/secondarypip",
             "type": "String"
         },
         "__encodeURIComponent__trafficmanagerprofiles____externalid": {
@@ -34,7 +57,8 @@
             "type": "string"
         },
         "connections_arm_1_connectionId": {
-            "defaultValue": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-global-dev01/providers/Microsoft.Web/connections/arm",
+            "defaultValue": "[resourceId('Microsoft.Web/connections',parameters('connections_arm_name'))]",
+            //"/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-global-dev01/providers/Microsoft.Web/connections/arm",
             "type": "String"
         }
     },

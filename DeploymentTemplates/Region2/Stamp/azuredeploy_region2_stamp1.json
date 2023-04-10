@@ -49,7 +49,7 @@
     },
     "singlePlacementGroup": {
       "type": "bool",
-      "defaultValue": true,
+      "defaultValue": false,
       "metadata": {
         "description": "When true this limits the scale set to a single placement group, of max size 100 virtual machines. NOTE: If singlePlacementGroup is true, it may be modified to false. However, if singlePlacementGroup is false, it may not be modified to true."
       }
@@ -126,6 +126,7 @@
     "privateLinkResource": {
       "type": "string",
       "defaultValue": "[concat(subscription().id,'/resourceGroups/', resourceGroup().name,'/providers/Microsoft.Sql/servers/',parameters('sqlserver_name'))]"
+      //"/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r2stamp2-workload-dev02/providers/Microsoft.Sql/servers/sqlserver-reg2st1-dev01"
     },
     "targetSubResource": {
       "type": "array"
@@ -262,11 +263,11 @@
       "apiVersion": "2021-11-01",
       "name": "[variables('vmScaleSetName')]",
       "location": "[parameters('location')]",
-      /*"zones": [
+      "zones": [
         "1",
         "2",
         "3"
-      ],*/
+      ],
       "sku": {
         "name": "[parameters('vmSku')]",
         "tier": "Standard",
@@ -319,31 +320,6 @@
               }
             ]
           }
-          /* "extensionProfile": {
-            "extensions": [
-              {
-                "name": "Microsoft.Powershell.DSC",
-                "properties": {
-                  "publisher": "Microsoft.Powershell",
-                  "type": "DSC",
-                  "typeHandlerVersion": "2.9",
-                  "autoUpgradeMinorVersion": true,
-                  "forceUpdateTag": "[parameters('powershelldscUpdateTagVersion')]",
-                  "settings": {
-                    "configuration": {
-                      "url": "[variables('powershelldscZipFullPath')]",
-                      "script": "DeployApp.ps1",
-                      "function": "InstallIIS"
-                    },
-                    "configurationArguments": {
-                      "nodeName": "localhost",
-                      "WebDeployPackagePath": "[variables('webDeployPackageFullPath')]"
-                    }
-                  }
-                }
-              }
-            ]
-          } */
         }
       },
       "dependsOn": [
@@ -359,12 +335,12 @@
       "sku": {
         "name": "Standard",
         "tier": "Regional"
-      }/*,
+      },
       "zones": [
         "1",
         "2",
         "3"
-      ]*/,
+      ],
       "properties": {
         "publicIPAllocationMethod": "Static",
         "dnsSettings": {
@@ -526,9 +502,5 @@
     }
   ],
   "outputs": {
-    "applicationUrl": {
-      "type": "string",
-      "value": "[uri(format('http://{0}', reference(resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))).dnsSettings.fqdn), '/MyApp')]"
-    }
   }
 }
