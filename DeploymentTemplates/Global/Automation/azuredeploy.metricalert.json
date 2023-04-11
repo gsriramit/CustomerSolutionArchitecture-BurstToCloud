@@ -63,7 +63,7 @@
                     ],
                     "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
                 },
-                "autoMitigate": true,
+                "autoMitigate": false,
                 "targetResourceType": "Microsoft.Insights/components",
                 "targetResourceRegion": "eastus",
                 "actions": [
@@ -104,7 +104,7 @@
                     ],
                     "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
                 },
-                "autoMitigate": true,
+                "autoMitigate": false,
                 "targetResourceType": "Microsoft.Insights/components",
                 "targetResourceRegion": "eastus",
                 "actions": [

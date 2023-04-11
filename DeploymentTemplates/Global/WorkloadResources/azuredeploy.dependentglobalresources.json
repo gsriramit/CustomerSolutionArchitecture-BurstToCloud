@@ -116,7 +116,7 @@
             "type": "Microsoft.Network/trafficManagerProfiles/azureEndpoints",
             "properties": {
               "targetResourceId": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourcegroups/', parameters('onpremRgName'), '/providers/Microsoft.Network/publicIPAddresses/',parameters('onpremEndpointPublicIpName'))]",
-              "endpointStatus": "Disabled",
+              "endpointStatus": "Enabled",
               "weight": 99
             }
           },

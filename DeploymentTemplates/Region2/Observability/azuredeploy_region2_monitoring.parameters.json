@@ -9,7 +9,7 @@
       "value": "PerGB2018"
     },
     "location": {
-      "value": "westus"
+      "value": "southcentralus"
     },
     "resourcePermissions": {
       "value": true
@@ -24,7 +24,7 @@
       "value": "r2appanalytics-01"
     },
     "insightsRegionId": {
-      "value": "westus"
+      "value": "southcentralus"
     },
     "tagsArray": {
       "value": {}

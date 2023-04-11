@@ -74,41 +74,6 @@
         "description": "Admin password on all VMs."
       }
     },
-    "_artifactsLocation": {
-      "type": "string",
-      "defaultValue": "[deployment().properties.templateLink.uri]",
-      "metadata": {
-        "description": "The base URI where artifacts required by this template are located. For example, if stored on a public GitHub repo, you'd use the following URI: https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-vmss-windows-webapp-dsc-autoscale/."
-      }
-    },
-    "_artifactsLocationSasToken": {
-      "type": "secureString",
-      "defaultValue": "",
-      "metadata": {
-        "description": "The sasToken required to access _artifactsLocation.  If your artifacts are stored on a public repo or public storage account you can leave this blank."
-      }
-    },
-    "powershelldscZip": {
-      "type": "string",
-      "defaultValue": "dsc/DeployApp.zip",
-      "metadata": {
-        "description": "Location of the PowerShell DSC zip file relative to the URI specified in the _artifactsLocation, i.e. DSC/IISInstall.ps1.zip"
-      }
-    },
-    "webDeployPackage": {
-      "type": "string",
-      "defaultValue": "webdeploy/cloudapp-01.zip",
-      "metadata": {
-        "description": "Location of the  of the WebDeploy package zip file relative to the URI specified in _artifactsLocation, i.e. WebDeploy/DefaultASPWebApp.v1.0.zip"
-      }
-    },
-    "powershelldscUpdateTagVersion": {
-      "type": "string",
-      "defaultValue": "1.0",
-      "metadata": {
-        "description": "Version number of the DSC deployment. Changing this value on subsequent deployments will trigger the extension to run."
-      }
-    },
     "location": {
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
@@ -172,8 +137,8 @@
     "frontEndIPConfigID": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', variables('loadBalancerName'), 'loadBalancerFrontEnd')]",
     "baseimageName": "vm-basewebserver-img_eastus_v1.1",
     "imageReference": "[concat(resourceGroup().id,'/providers/Microsoft.Compute/images/', variables('baseimageName'))]", /*"[variables('osType')]",*/
-    "webDeployPackageFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('webDeployPackage'), parameters('_artifactsLocationSasToken')))]",
-    "powershelldscZipFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('powershelldscZip'), parameters('_artifactsLocationSasToken')))]",
+    //"webDeployPackageFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('webDeployPackage'), parameters('_artifactsLocationSasToken')))]",
+    //"powershelldscZipFullPath": "[uri(parameters('_artifactsLocation'), format('{0}{1}', parameters('powershelldscZip'), parameters('_artifactsLocationSasToken')))]",
     "privateendpointSubnetId":"[concat(subscription().id,'/resourceGroups/', parameters('resourcegroupName'),'/providers/Microsoft.Network/virtualNetworks/',variables('vNetName'),'/subnets/',variables('privatendpointSubnetName'))]"
 
   },

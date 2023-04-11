@@ -2,6 +2,10 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "southcentralus"
+        },
         "workflows_la_bursttocloud_name": {
             "defaultValue": "trafficmgmtapp-dev01",
             "type": "String"
@@ -53,7 +57,7 @@
             }
         },
         "connections_arm_id": {
-            "defaultValue": "[subscriptionResourceId('Microsoft.Web/locations/managedApis', resourceGroup().location, parameters('connections_arm_name'))]",
+            "defaultValue": "[subscriptionResourceId('Microsoft.Web/locations/managedApis', parameters('location'), parameters('connections_arm_name'))]",
             "type": "string"
         },
         "connections_arm_1_connectionId": {
@@ -68,7 +72,7 @@
             "type": "Microsoft.Web/connections",
             "apiVersion": "2016-06-01",
             "name": "[parameters('connections_arm_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('location')]",
             "kind": "V1",
             "properties": {
                 "displayName": "ARM Connection",
@@ -82,7 +86,7 @@
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
             "name": "[parameters('workflows_la_bursttocloud_name')]",
-            "location": "westus",
+            "location": "[parameters('location')]",
             "dependsOn":[
                 "[resourceId('Microsoft.Web/connections',parameters('connections_arm_name'))]"
             ],
@@ -405,12 +409,12 @@
                                                 "id": "[concat(parameters('trafficManagerProfile_id'), '/azureEndpoints/reg2s1appscaleset')]",
                                                 "name": "reg2s1appscaleset",
                                                 "properties": {
-                                                    "endpointLocation": "West US",
+                                                    "endpointLocation": "SouthCentral US",
                                                     "endpointMonitorStatus": "Enabled",
                                                     "endpointStatus": "Enabled",
                                                     "minChildEndpoints": null,
                                                     "priority": 2,
-                                                    "target": "reg2s1appscaleset.westus.cloudapp.azure.com",
+                                                    "target": "reg2s1appscaleset.southcentralus.cloudapp.azure.com",
                                                     "targetResourceId": "[parameters('secondaryRegionpip_id')]",
                                                     "weight": "@variables('AzureUpdatedWeight')"
                                                 },

@@ -14,9 +14,6 @@
         "subnetName": {
             "value": "primaryapsubnet"
         },
-        "virtualNetworkId": {
-            "value": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r1stamp1-workload-dev01/providers/Microsoft.Network/virtualNetworks/primaryapvnet"
-        },
         "virtualMachineName": {
             "value": "vm-baseprep-dev01"
         },

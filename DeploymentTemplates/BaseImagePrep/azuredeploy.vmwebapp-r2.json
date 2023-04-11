@@ -15,7 +15,8 @@
             "type": "string"
         },
         "virtualNetworkId": {
-            "type": "string"
+            "type": "string",
+            "defaultValue":"[resourceId('Microsoft.Network/virtualNetworks','secondaryvnet')]"
         },
         "virtualMachineName": {
             "type": "string"

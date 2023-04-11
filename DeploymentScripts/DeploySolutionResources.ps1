@@ -7,7 +7,7 @@ $global_rg_Name = "rg-global-dev01"
 $tenantId="d787514b-d3f2-45ff-9bf1-971fb473fc85"
 $subscriptionId= "695471ea-1fc3-42ee-a854-eab6c3009516"
 $region1_location="eastus"
-$region2_location="westus"
+$region2_location="southcentralus"
 $global_rg_location="westus"
 $databasename = "svc-Todo-primaryDb"
 $primaryServerName ="sqlserver-reg1st1-dev01" 
@@ -40,10 +40,6 @@ New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $region1_rg_sta
 -TemplateFile "..\DeploymentTemplates\Region1\Stamp\azuredeploy_region1_stamp1.json" `
 -TemplateParameterFile "..\DeploymentTemplates\Region1\Stamp\azuredeploy_region1_stamp1.parameters.json"
 
-
-# To-Do: DELETE THIS ***Create the VNET link between the workload VNET and privatelink.database.windows.net private DNS zone
-#$Link = New-AzPrivateDnsVirtualNetworkLink -ZoneName $databasePrivateDNSZone -ResourceGroupName $global_rg_Name -Name "r1stamp1-link-database" -VirtualNetworkId "/subscriptions/$subscriptionId/resourceGroups/$region1_rg_stamp1/providers/Microsoft.Network/virtualNetworks/primaryapvnet" -EnableRegistration
-
 # Region#2
 # Deploy the monitoring resources
 New-AzResourceGroupDeployment -Verbose -Force -ResourceGroupName $region2_rg_monitoring `
@@ -73,7 +69,7 @@ $database = Get-AzSqlDatabase -DatabaseName $databasename -ResourceGroupName $re
 $database | New-AzSqlDatabaseSecondary -PartnerResourceGroupName $region2_rg_stamp1 -PartnerServerName $secondaryServerName -AllowConnections "All"
 
 ### A very important step ###
-# the following sql script has to be run to create the ToDo table in the target database
+# the following sql script has to be run to create the ToDo table in the target database. 
 # CreateToDoTable.sql
 # options of running the script
 # a) from the SQL Query explorer window (Azure portal) (OR)
