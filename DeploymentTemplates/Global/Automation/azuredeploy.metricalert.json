@@ -20,7 +20,6 @@
         },
         "appinsights_id": {
             "defaultValue": "[concat(subscription().id,'/resourcegroups/',parameters('stamp1_monitoring_rgname'),'/providers/Microsoft.Insights/components/',parameters('stamp1_appInsightsName'))]",
-            //"/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r1monitoring-dev01/providers/Microsoft.Insights/components/r1appanalytics-01",
             "type": "String"
         },
         "actionGroup_Name":{
@@ -28,8 +27,7 @@
             "defaultValue":"ag-logicapp-bursttocloud"
         },
         "actionGroup_id": {
-            "defaultValue": "[resourceId('microsoft.insights/actionGroups',parameters('actionGroup_Name'))]",
-            //"/subscriptions/695471EA-1FC3-42EE-A854-EAB6C3009516/resourceGroups/rg-monitoring-dev01/providers/microsoft.insights/actionGroups/ag-logicapp-bursttocloud",
+            "defaultValue": "[resourceId('microsoft.insights/actionGroups',parameters('actionGroup_Name'))]",            
             "type": "String"
         }
     },

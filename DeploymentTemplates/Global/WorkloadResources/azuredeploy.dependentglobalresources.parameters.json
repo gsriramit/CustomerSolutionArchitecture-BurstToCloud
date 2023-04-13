@@ -6,7 +6,7 @@
       "value": "southcentralus"
     },
     "subscriptionId": {
-      "value": "695471ea-1fc3-42ee-a854-eab6c3009516"
+      "value": ""
     },
     "onpremRgName": {
       "value": "rg-r1stamp1-workload-dev01"

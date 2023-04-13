@@ -11,8 +11,7 @@
             "defaultValue":"trafficmgmtapp-dev01"
         },
         "logicapp_workflow_id": {
-            "defaultValue": "[resourceId('Microsoft.Logic/workflows',parameters('logicapp_workflowName'))]",
-            //"/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-global-dev01/providers/Microsoft.Logic/workflows/la-bursttocloud",
+            "defaultValue": "[resourceId('Microsoft.Logic/workflows',parameters('logicapp_workflowName'))]",           
             "type": "String"
         }
     },

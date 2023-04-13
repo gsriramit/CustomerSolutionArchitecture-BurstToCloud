@@ -45,7 +45,7 @@
     },
     "workspaceResourceId": {
       "type": "string",
-      "defaultValue": "/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-monitoring-dev02/providers/Microsoft.OperationalInsights/workspaces/r2-monitoring-workspace-dev01"
+      "defaultValue": "/subscriptions/<subscriptionId>/resourceGroups/rg-monitoring-dev02/providers/Microsoft.OperationalInsights/workspaces/r2-monitoring-workspace-dev01"
     },
     "workspaceName": {
       "type": "string",

@@ -23,8 +23,7 @@
             "defaultValue":"rg-r2stamp2-workload-dev02"
         },
         "trafficManagerProfile_id": {
-            "defaultValue": "[resourceId('Microsoft.Network/trafficManagerProfiles',parameters('globalLoadbalancerName'))]",
-            //"/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-global-dev01/providers/Microsoft.Network/trafficManagerProfiles/globallb-dev01",
+            "defaultValue": "[resourceId('Microsoft.Network/trafficManagerProfiles',parameters('globalLoadbalancerName'))]",            
             "type": "String"
         },
         "region1EndpointId":{
@@ -36,17 +35,16 @@
             "defaultValue":"secondarypip"
         },
         "primaryRegionpip_id": {
-            "defaultValue": "[concat(subscription().id,'/resourceGroups/',parameters('region1stamp1_rgName'),'/providers/Microsoft.Network/publicIPAddresses/',parameters('region1EndpointId'))]",
-            //"/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r1stamp1-workload-dev01/providers/Microsoft.Network/publicIPAddresses/primaryappip",
+            "defaultValue": "[concat(subscription().id,'/resourceGroups/',parameters('region1stamp1_rgName'),'/providers/Microsoft.Network/publicIPAddresses/',parameters('region1EndpointId'))]",            
             "type": "String"
         },
         "secondaryRegionpip_id": {
             "defaultValue": "[concat(subscription().id,'/resourceGroups/',parameters('region2stamp1_rgName'),'/providers/Microsoft.Network/publicIPAddresses/',parameters('region2EndpointId'))]",
-            //"/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r2stamp2-workload-dev02/providers/Microsoft.Network/publicIPAddresses/secondarypip",
+
             "type": "String"
         },
         "__encodeURIComponent__trafficmanagerprofiles____externalid": {
-            "defaultValue": "/subscriptions/@{encodeURIComponent('695471ea-1fc3-42ee-a854-eab6c3009516')}/resourceGroups/@{encodeURIComponent('rg-global-dev01')}/providers/@{encodeURIComponent('Microsoft.Network')}/@{encodeURIComponent('trafficmanagerprofiles/globallb-dev01')}",
+            "defaultValue": "/subscriptions/@{encodeURIComponent('')}/resourceGroups/@{encodeURIComponent('rg-global-dev01')}/providers/@{encodeURIComponent('Microsoft.Network')}/@{encodeURIComponent('trafficmanagerprofiles/globallb-dev01')}",
             "type": "String"
         },
         "connections_arm_name": {
@@ -61,8 +59,7 @@
             "type": "string"
         },
         "connections_arm_1_connectionId": {
-            "defaultValue": "[resourceId('Microsoft.Web/connections',parameters('connections_arm_name'))]",
-            //"/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-global-dev01/providers/Microsoft.Web/connections/arm",
+            "defaultValue": "[resourceId('Microsoft.Web/connections',parameters('connections_arm_name'))]",            
             "type": "String"
         }
     },
@@ -733,8 +730,7 @@
                             "arm_1": {
                                 "connectionId": "[parameters('connections_arm_1_connectionId')]",
                                 "connectionName": "[parameters('connections_arm_name')]",
-                                "id": "[parameters('connections_arm_id')]"
-                                //"/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/providers/Microsoft.Web/locations/westus/managedApis/arm"
+                                "id": "[parameters('connections_arm_id')]"                                
                             }
                         }
                     }

@@ -9,7 +9,7 @@
             "value":"azautoscalevmss-secondaryapp-01"
         },
         "targetResourceSubscriptionId":{
-            "value":"695471ea-1fc3-42ee-a854-eab6c3009516"
+            "value":""
         },
         "targetResourceRg":{
             "value":"rg-r2stamp2-workload-dev02"

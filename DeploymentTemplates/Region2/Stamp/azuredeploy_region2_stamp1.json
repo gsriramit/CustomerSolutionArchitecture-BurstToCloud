@@ -91,7 +91,6 @@
     "privateLinkResource": {
       "type": "string",
       "defaultValue": "[concat(subscription().id,'/resourceGroups/', resourceGroup().name,'/providers/Microsoft.Sql/servers/',parameters('sqlserver_name'))]"
-      //"/subscriptions/695471ea-1fc3-42ee-a854-eab6c3009516/resourceGroups/rg-r2stamp2-workload-dev02/providers/Microsoft.Sql/servers/sqlserver-reg2st1-dev01"
     },
     "targetSubResource": {
       "type": "array"
