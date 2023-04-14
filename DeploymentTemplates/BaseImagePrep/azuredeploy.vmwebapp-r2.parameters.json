@@ -57,7 +57,7 @@
             "value":"setwebserverenv.ps1"
         },
         "customScriptFileUri": {
-            "value": "https://stawebserverdeploy01.blob.core.windows.net/dsc/setwebserverenv.ps1"
+            "value": "https://<staname>.blob.core.windows.net/dsc/setwebserverenv.ps1"
         }
     }
 }

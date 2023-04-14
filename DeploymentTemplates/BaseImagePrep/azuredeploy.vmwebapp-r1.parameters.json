@@ -57,13 +57,13 @@
             "value": "setwebserverenv.ps1"
         },
         "customScriptFileUri": {
-            "value": "https://stawebserverdeploy01.blob.core.windows.net/dsc/setwebserverenv.ps1"
+            "value": "https://<staname>.blob.core.windows.net/dsc/setwebserverenv.ps1"
         },
         "_artifactsLocation": {
-            "value": "https://stawebserverdeploy01.blob.core.windows.net/"
+            "value": "https://<staname>.blob.core.windows.net/"
         },
         "_artifactsLocationSasToken": {
-            "value": "?sv=2021-12-02&ss=b&srt=sco&sp=rltf&se=2023-04-14T16:22:32Z&st=2023-03-15T08:22:32Z&spr=https,http&sig=cVZadLj8B2j59%2BmJIYJRHo41%2FzBtJxi7mCa1b6yAR5I%3D"
+            "value": ""
         }
     }
 }

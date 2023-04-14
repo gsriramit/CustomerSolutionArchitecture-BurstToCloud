@@ -45,9 +45,10 @@ Set-Location IIS:\Sites
 New-Item iis:\Sites\CloudAppSite -bindings @{protocol="http";bindingInformation=":8080:"} -physicalPath C:\inetpub\wwwroot\CloudApp
 
 ## This portion of the script deploys the application to IIS
-# $Destination = "C:\WindowsAzure\WebApplication.zip"      
-# $deploymentPackageBasePath= "https://stawebserverdeploy01.blob.core.windows.net/"
-# $WebDeployPackagePath = $deploymentPackageBasePath + $deploymentPackageName
+# $Destination = "C:\WindowsAzure\WebApplication.zip"
+# Note: the name of the package will be cloudapp-01.zip for region#1 and cloudapp-02.zip for region 2
+# The statements in the commented out section have to be run manually. These do not seem to work from the Azure Vm extension execution and the issue is yet to fixed
+# $WebDeployPackagePath = "https://stawebserverdeploy01.blob.core.windows.net/webdeploy/cloudapp-01.zip?<sastoken>"
 # Web request to download the application deployment package
 # Invoke-WebRequest -Uri $WebDeployPackagePath -OutFile $Destination -Verbose
 # Get a reference to the path where the msdeploy.exe is located
