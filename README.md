@@ -1,10 +1,12 @@
 # Traffic Management -Burst To Cloud
 
 ## What is Cloud Bursting
-In cloud computing, cloud bursting is a configuration that’s set up between a private cloud and a public cloud **to deal with peaks in IT demand. If an organization using a private cloud reaches 100 percent of its resource capacity, the overflow traffic is directed to a public cloud so there’s no interruption of services.**
-
+In cloud computing, cloud bursting is a configuration that’s set up between a private cloud and a public cloud **to deal with peaks in IT demand. If an organization using a private cloud reaches 100 percent of its resource capacity, the overflow traffic is directed to a public cloud so there’s no interruption of services.**  
 In addition to flexibility and self-service functionality, the key advantage to cloud bursting is economical savings. **You only pay for the additional resources when there is a demand for those resources - no more spending on extra capacity you’re not using or trying to predict demand peaks and fluctuations**. An application can be applied to the private cloud, then burst to the public cloud only when necessary to meet peak demands. Plus, cloud bursting can also be used to shoulder processing burdens by moving basic applications to the public cloud to free up local resources for business-critical applications. When using cloud bursting, you should **consider security and compliance requirements, latency, load balancing, and platform compatibility**.  
 src: https://azure.microsoft.com/en-us/resources/cloud-computing-dictionary/what-is-cloud-bursting/  
+
+### Abstract of the Solution
+The solution that has been implemented to demonstrate cloud bursting is a form of High-Availability Design that uses Azure as a destination for traffic that overflows or exceeds the processing capability of the on-premise setup. The advantages of this approach have been mentioned in the previous section. One key point about this solution is that Azure will not be the fail-over endpoint, rather it would be deployed and made to run in a hot-standby mode. To make repeatable deployments easy, we have selected a couple of Azure regions with one representing On-premise. The solution however can be applied to a proper hybrid setup as well. 
 
 ## Abstract of the Solution Implementation Plan
 - Example: An asp.net application running on-premise is instrumented with application insights
