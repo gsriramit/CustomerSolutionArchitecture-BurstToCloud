@@ -1,4 +1,4 @@
-# Traffic Management -Burst To Cloud
+# High Availability -Burst To Cloud
 
 ## What is Cloud Bursting
 In cloud computing, cloud bursting is a configuration that’s set up between a private cloud and a public cloud **to deal with peaks in IT demand. If an organization using a private cloud reaches 100 percent of its resource capacity, the overflow traffic is directed to a public cloud so there’s no interruption of services.**  
