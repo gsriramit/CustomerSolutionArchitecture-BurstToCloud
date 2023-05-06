@@ -56,3 +56,16 @@ Additional References:
      - **Reference Implementation of a Caching Strategy in a .Net Applicaiton** - https://github.com/gsriramit/CachingStrategies  
 5. **Monitoring Data read and write throughput  against the P90/P95 latency requirements** - This has not been implemented in this solution. However, the metrics from Aure SQL DB should be ingested into the targeted log analytics workspace and further analyzed to understand the performance of the data platform for varied throughput scenarios.  
    - **Query Performance Insights** - https://learn.microsoft.com/en-us/azure/azure-sql/database/query-performance-insight-use?view=azuresql#view-individual-query-details. This documentation provides the features available in the platform to understand the details of each of the executed queries. The "duration" data should be used to underdstand if the data platform is able to meet the throughout and the latency requirements at once. 
+#### Veracity
+1. **Support for a multi-region data platform design** - This solution uses Azure SQLDB Geo-Replicas to have the database distributed across 2 regions. This helps in ensuring maximum reliability, availability, and performance.
+     - **Data replicas across Availability Zones (AZs)** Zone-redundancy feature of the Gen5 tier has been used to maximize intra-region availability.
+2. **Support for Multi-region write** - As SQL is a single-master database, the solution does not support multi-region write requirements
+3. **BCDR** - This solution does not include an implementation for backup & restore and the fail-over scenarios. However, these design and architecture are pretty much compatible with the common BCDR measures available for Azure SQLDB.
+4. **Performance Benchmarks** - The performance benchmarks of the application as a whole involves doing load and stress testing against the app and observing the performance of the same. The data platform however needs to be tested separately. The following article has reference to tools that can be used to benchmark disks for throughput
+     - **Disk Benchmarking**- https://learn.microsoft.com/en-us/azure/virtual-machines/disks-benchmarks  
+     - **Benchmarking SQL Server and Azure SQL with WorkloadTools** -  https://learn.microsoft.com/en-us/shows/data-exposed/benchmarking-sql-server-and-azure-sql-with-workloadtools
+5. **Encryption of Data** - This solution uses the platform-managed encryption keys to encrypt data at rest. If the solution needs to be extended to use Customer-Managed keys, then the keys need to be imported into Azure Keyvault and then used with Azure SQL Database.  
+
+### Additional Design Considerations
+
+
