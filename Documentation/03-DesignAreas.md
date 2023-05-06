@@ -93,8 +93,20 @@ The following table shows the availability options based on service tiers:
 | Standard (DTU)            | Remote storage          | Yes                            | No                          |
 | Premium (DTU)             | Local storage           | Yes                            | Yes                         |  
 
-The following diagram shows the Always-On Availability group feature built into the Premium and Business Critical SKUs
+The following diagram shows the Always-On Availability group feature built into the Premium and Business Critical SKUs  
+**Reference:**https://learn.microsoft.com/en-us/azure/azure-sql/database/high-availability-sla?view=azuresql&tabs=azure-powershell#premium-and-business-critical-service-tier-locally-redundant-availability
 ![image](https://user-images.githubusercontent.com/13979783/236626204-d99bd243-5335-4ed0-be93-3df250c78a78.png)
 
+**1.2.1 Extending Azure SQLDB to Multiple Regions**
+In comparison to the architecture depicted in section#1.1, Azure SQLDB being a managed service offers a feature called **Active Geo-replication**. Following is an excerpt from the MS documentation
+*Active geo-replication leverages the **Always On availability group technology to asynchronously replicate transaction log generated on the primary replica to all geo-replicas**. While at any given point, a secondary database might be slightly behind the primary database, the data on a secondary is guaranteed to be transactionally consistent. In other words, changes made by uncommitted transactions are not visible.*  
+**Multiple readable geo-secondaries**  
+Up to *four geo-secondaries can be created for a primary*. If there is only one secondary, and it fails, the application is exposed to higher risk until a new secondary is created. If multiple secondaries exist, the application remains protected even if one of the secondaries fails. Additional secondaries can also be used to scale out read-only workloads.  
+**Reference:**https://learn.microsoft.com/en-us/azure/azure-sql/database/active-geo-replication-overview?view=azuresql  
 
+**Availability SLO, RPO and RTO of Azure SQLDB Business Critical Servers**  
+- Azure SQL Database offers a baseline 99.99% availability SLA across all of its service tiers, but provides a higher **99.995% SLA for the Business Critical or Premium tiers in regions that support availability zones**.
+- Azure SQL Database Business Critical or Premium tiers not configured for Zone Redundant Deployments have an availability SLA of 99.99%. When configured with geo-replication, the Azure SQL Database Business Critical tier provides a **Recovery Time Objective (RTO) of 30 seconds for 100% of deployed hours**.
+- When configured with geo-replication, the Azure SQL Database Business Critical tier has a **Recovery point Objective (RPO) of 5 seconds for 100% of deployed hours**.
+- **Reference**:https://learn.microsoft.com/en-us/azure/well-architected/mission-critical/mission-critical-data-platform#design-considerations-2
 
