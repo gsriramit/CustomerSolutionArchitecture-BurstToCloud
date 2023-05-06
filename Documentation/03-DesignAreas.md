@@ -70,9 +70,31 @@ Additional References:
 
 ### Additional Design Considerations
 #### 1. Data Platform High-Availability
-According to the actual design of using SQL on Virtual Machines, the on-premises would have had SQL installed in more than 1 machine to form an **Always-On Availability Group**. The SQL instances would have read replicas in addition to the one master/write replica, to handle the read requests. Also the always-on availability group provides regional resiliency where in one of the read replicas will be promoted as the master if the existing master node fails. This is a process of fail-over that happens within the ring of the availability group that makes it highly available. To further enhance the availability, when a multi-region application deployment approach is used, the Availability group will be extended from on-premises to Azure. The following diagram from the documentation illustrates the architecture of an always-on AG extended to a secondary Azure region. The concept is quite similar for a hybrid deployment wherein the on-premises and Azure networks are connected through an Azure Express Route Connection. **Note:** A VPN connection between the networks would not be ideal for a Mission-Critical workload as this would cause additional latencies when cross-region traffic needs to be handled. 
+**1.1 High Availability Design of SQL on Azure VMs and Hybrid Setups**
+According to the actual design of using SQL on Virtual Machines, the on-premises would have had SQL installed in more than 1 machine to form an **Always-On Availability Group**. The SQL instances would have read replicas in addition to the one master/write replica, to handle the read requests. Also the always-on availability group provides regional resiliency where in one of the read replicas will be promoted as the master if the existing master node fails. This is a process of fail-over that happens within the ring of the availability group that makes it highly available. To further enhance the availability, when a multi-region application deployment approach is used, the Availability group will be extended from on-premises to Azure. The following diagram from the documentation illustrates the architecture of an always-on AG extended to a secondary Azure region. The concept is quite similar for a hybrid deployment wherein the on-premises and Azure networks are connected through an Azure Express Route Connection. **Note:** A VPN connection between the networks would not be ideal for a Mission-Critical workload as this would cause additional latencies when cross-region traffic needs to be handled.  
+**Reference:** https://learn.microsoft.com/en-us/azure/azure-sql/virtual-machines/windows/availability-group-manually-configure-multi-subnet-multiple-regions?view=azuresql
 
-![image](https://user-images.githubusercontent.com/13979783/236625109-8e8d612c-2296-4073-ac07-4c946b26475f.png)
+![image](https://user-images.githubusercontent.com/13979783/236625109-8e8d612c-2296-4073-ac07-4c946b26475f.png)  
+**1.2 High Availability Design of Azure SQL DB**
+When using Azure SQL DB, the Business Critical SKU offers the necessary high availability feature by default. A SQL Database created in a Business Critical Server will be created with an **Always-on availability Group** with one master instance and 3 read replicas created in the ring. The following diagram illustrates the same. Another key aspect that needs to be noticed is that the Business Critical SKU comes with the locally attached storage disks to handle very low latency requirements. This necessarily does not fit into the HA features, but this is an important feature for mission-critical workloads with very low latency tolerance.  
+Excerpt from the MS documentation
+There are three high availability architectural models:  
+- **Remote storage model** that is based on a separation of compute and storage. It relies on the high availability and reliability of the remote storage tier. This architecture targets budget-oriented business applications that can tolerate some performance degradation during maintenance activities.
+- **Local storage model** that is based on a cluster of database engine processes. It relies on the fact that there is **always a quorum of available database engine nodes. This architecture targets mission-critical applications with high IO performance, high transaction rate and guarantees minimal performance impact** to your workload during maintenance activities.
+- **Hyperscale model** which uses a distributed system of highly available components such as compute nodes, page servers, log service, and persistent storage. Each component supporting a Hyperscale database provides its own redundancy and resiliency to failures. Compute nodes, page servers, and log service run on Azure Service Fabric, which controls health of each component and performs failovers to available healthy nodes as necessary. Persistent storage uses Azure Storage with its native high availability and redundancy capabilities. To learn more, see Hyperscale architecture.  
+The following table shows the availability options based on service tiers:  
+
+| Service tier              | High availability model | Locally-redundant availability | Zone-redundant availability |
+| ------------------------- | ----------------------- | ------------------------------ | --------------------------- |
+| General purpose (vCore)   | Remote storage          | Yes                            | Yes                         |
+| **Business Critical (vCore)** | **Local storage**           | **Yes**                            | **Yes**                         |
+| Hyperscale (vCore)        | Hyperscale              | Yes                            | Yes                         |
+| Basic (DTU)               | Remote storage          | Yes                            | No                          |
+| Standard (DTU)            | Remote storage          | Yes                            | No                          |
+| Premium (DTU)             | Local storage           | Yes                            | Yes                         |  
+
+The following diagram shows the Always-On Availability group feature built into the Premium and Business Critical SKUs
+![image](https://user-images.githubusercontent.com/13979783/236626204-d99bd243-5335-4ed0-be93-3df250c78a78.png)
 
 
 
