@@ -144,10 +144,15 @@ https://learn.microsoft.com/en-us/azure/well-architected/mission-critical/missio
 Refer to the official documentation for the design considerations and recommendations. This solution does not include Caching specific design and implementation
 https://learn.microsoft.com/en-us/azure/well-architected/mission-critical/mission-critical-networking-connectivity#caching-and-static-content-delivery
 
-### Virtual Network Design
+#### Virtual Network Design
 The Mission Critical guidelines advices against the interaction between the stamps in different regions as these are supposed to be independent units handling the regional traffic. This helps in lowering or avoiding  the impact of stamp in one reion by the failure of the components in the other. However
 The reasons for the design decision have been discussed below. This solution however uses a connected VNET design for the following reasons  
+1. SQL being a single master DB, **the traffic that bursts out to Azure from on-premises or the primary region will contain read and write requests**. When the secondary Azure stamp receives write requests, the same has to be sent to the master replica hosted in the primary DB server in the primary region. This connection to the private endpoint of the primary replica would be established through the global virtual network peerig between the regional networks
+2. If Azure Front Door could have been used, the alternate design option could be identifying the read and write requests based on the URL and route the appropriate traffic between the on-premises/primary endpoint and the Azure/Secondary endpoint i.e the write requests to primary and read requests to the secondary. However, one aspect to be kept in mind is that **this method of partitioning the traffic might prove to be imbalanced**. This happens when there are mroe write requests that are recieved by the application even after bursting to Azure. This would again cause the primary endpoint to be overloaded and would defeat the purpose of using Azure to handle the spill-over traffic
+3. **Note:** If the stamps are made independent, the asynchronous replication between the master/primary and secondary replica(s) in the secondary regions would happen over the MS backbone network and would not require the peering between the globalally separate networks  
 
+#### Private Endpoints and Private DNS zones
+TBD
 
 
 
