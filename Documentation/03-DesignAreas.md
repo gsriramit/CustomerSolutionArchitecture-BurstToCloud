@@ -108,5 +108,10 @@ Up to *four geo-secondaries can be created for a primary*. If there is only one 
 - Azure SQL Database offers a baseline 99.99% availability SLA across all of its service tiers, but provides a higher **99.995% SLA for the Business Critical or Premium tiers in regions that support availability zones**.
 - Azure SQL Database Business Critical or Premium tiers not configured for Zone Redundant Deployments have an availability SLA of 99.99%. When configured with geo-replication, the Azure SQL Database Business Critical tier provides a **Recovery Time Objective (RTO) of 30 seconds for 100% of deployed hours**.
 - When configured with geo-replication, the Azure SQL Database Business Critical tier has a **Recovery point Objective (RPO) of 5 seconds for 100% of deployed hours**.
-- **Reference**:https://learn.microsoft.com/en-us/azure/well-architected/mission-critical/mission-critical-data-platform#design-considerations-2
+- **Reference**:https://learn.microsoft.com/en-us/azure/well-architected/mission-critical/mission-critical-data-platform#design-considerations-2  
+
+## 3. Networking and Connectivity
+### Design Considerations and Recommendations
+#### Why Traffic Manager and Not FrontDoor for Global Traffic Routing
+According to the decision tree approach in choosing a global load balancer, for the application that we have designed that is HTTP based, Azure Front Door would have been the perfect fit. The following was the ***criteria for a design decision that contrary to suggested best practice***. **Bursting to cloud** needs to happen when the request scale exceeds the peak capacity of the on-premises setup. Even when the burst happens, only a fraction of the traffic needs to be diverted to the Azure Endpoint. This fractionn has been calculated based on the baselining & benchmarking processes executed against the on-premise setup. The volume of traffic sent to Azure would keep increasing if the overall traffic keeps increasing. Similarly, with a decrease in the traffic to anything that the on-premises can handle, the entire trafffic would be diverted back 
 
