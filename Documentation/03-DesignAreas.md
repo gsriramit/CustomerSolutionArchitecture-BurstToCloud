@@ -125,8 +125,29 @@ Up to *four geo-secondaries can be created for a primary*. If there is only one 
 4. **Note:** 
      - The support for Azure FrontDoor privately connecting to an Azure Application Gateway is still not supported. So a trade off has to be made between the requirements of having the private connectivity to the endpoint and the multitude of uses of a regional L7 LB.
      - If this design decision is to be taken, the web application firewall can be placed in the FrontDoor so that the security scanning of the traffic would be done by the FrontDoor instance handling the traffic. Also the FrontDoor can compensate for the unavailability of the regional L7 LB for the path based routing by routing the traffic to the origin group based on the path. 
-     - **Reference:** https://learn.microsoft.com/en-us/azure/frontdoor/front-door-route-matching?pivots=front-door-standard-premium#structure-of-a-front-door-route-configuration
-     - 
+     - **Reference:** https://learn.microsoft.com/en-us/azure/frontdoor/front-door-route-matching?pivots=front-door-standard-premium#structure-of-a-front-door-route-configuration  
+
+#### Other Design Considerations when using Azure Traffic Manager
+Excerpt from the official MS documentation, applicable to this solution -
+1. Use Traffic Manager for non HTTP/S scenarios as a replacement to Azure Front Door. **Capability differences will drive different design decisions for cache and WAF capabilities, and TLS certificate management**.
+2. WAF capabilities should be considered within each region for the Traffic Manager ingress path, using Azure Application Gateway.
+3. Configure a suitably low TTL value to optimize the time required to remove an unhealthy backend endpoint from circulation in the event that backend becomes unhealthy.
+4. Similar to with Azure Front Door, a *custom TCP health endpoint* should be defined to validate critical downstream dependencies within a regional deployment stamp, which should be reflected in the response provided by health endpoints.
+5. However, for Traffic Manager additional consideration should be given to service level regional fail over. such as 'dog legging', to mitigate the potential delay associated with the removal of an unhealthy backend due to dependency failures, particularly if it's not possible to set a low TTL for DNS records.
+6. Consideration should be given to third-party CDN providers in order to achieve edge caching when using Azure Traffic Manager as a primary global routing service. Where edge WAF capabilities are also offered by the third-party service, consideration should be given to simplify the ingress path and potentially remove the need for Application Gateway.
+
+#### Application Delivery Services
+Refer to the official documentation for the design considerations and recommendations. This solution does not include App delivery services
+https://learn.microsoft.com/en-us/azure/well-architected/mission-critical/mission-critical-networking-connectivity#application-delivery-services
+
+#### Caching and Static Content Delivery Services
+Refer to the official documentation for the design considerations and recommendations. This solution does not include Caching specific design and implementation
+https://learn.microsoft.com/en-us/azure/well-architected/mission-critical/mission-critical-networking-connectivity#caching-and-static-content-delivery
+
+### Virtual Network Design
+The Mission Critical guidelines advices against the interaction between the stamps in different regions as these are supposed to be independent units handling the regional traffic. This helps in lowering or avoiding  the impact of stamp in one reion by the failure of the components in the other. However
+The reasons for the design decision have been discussed below. This solution however uses a connected VNET design for the following reasons  
+
 
 
 
