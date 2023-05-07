@@ -113,5 +113,23 @@ Up to *four geo-secondaries can be created for a primary*. If there is only one 
 ## 3. Networking and Connectivity
 ### Design Considerations and Recommendations
 #### Why Traffic Manager and Not FrontDoor for Global Traffic Routing
-According to the decision tree approach in choosing a global load balancer, for the application that we have designed that is HTTP based, Azure Front Door would have been the perfect fit. The following was the ***criteria for a design decision that contrary to suggested best practice***. **Bursting to cloud** needs to happen when the request scale exceeds the peak capacity of the on-premises setup. Even when the burst happens, only a fraction of the traffic needs to be diverted to the Azure Endpoint. This fractionn has been calculated based on the baselining & benchmarking processes executed against the on-premise setup. The volume of traffic sent to Azure would keep increasing if the overall traffic keeps increasing. Similarly, with a decrease in traffic to anything that the on-premises can handle, the entire trafffic would be diverted back to the on-premises endpoint. This dynamic decision to send  
+1. According to the decision tree approach in choosing a global load balancer, for the application that we have designed that is HTTP based, Azure Front Door would have been the perfect fit. The following was the ***criteria for a design decision that contrary to suggested best practice***. **Bursting to cloud** needs to happen when the request scale exceeds the peak capacity of the on-premises setup. 
+2. Even when the burst happens, only a fraction of the traffic needs to be diverted to the Azure Endpoint. This fractionn has been calculated based on the baselining & benchmarking processes executed against the on-premise setup. The volume of traffic sent to Azure would keep increasing if the overall traffic keeps increasing. Similarly, with a decrease in traffic to anything that the on-premises can handle, the entire trafffic would be diverted back to the on-premises endpoint. 
+3. This dynamic decision to moderate the traffic between the 2 endpoints needs to happen based on the traffic patterns and should be handled by the global load balancer. The **Weighted Traffic Routing** method available in the Azure Traffic manager lets us implement the changes to the weight of the traffic being sent to each of the 2 endpoints. However, the weighted routing feature available in Azure FrontDoor lets you define weights to the origins within an origin group and the origin group being defined in one region. So this feature limitation makes Azure Front door not suitable for this Burst scenario
+
+####  Regional Load Balancing
+1. The choice of the regional balancer should be an application gateway with the web application firewall so as the handle the L7 routing requirements (if any). WAF can provide the intended security at L7. This will be discussed in detail in the "Security" Design Area. 
+2. In this solution, we have selected a L4 public load balancer to receive the traffic at the regional level. *There is no specific reason behind this design decision*. The only consideration is that the load balancer, be it an app gateway or a Azure load balancer has to have a public frontend as the Traffic Manager can work only with public endpoints. 
+   - This is by design as the Traffic Manager does not participate in the actual routing of the data packets. The client would receive the FQDN of the endpoint that the Traffic Manager selects (based on the configured algorithm and also the health of the endpoint) and would make a direct connection to the endpoint over the internet.
+3. An alternate design could be having the Azure Front door connect privately to an Internal Load Balancer (ILB) through its support for Private Link. With this option, the traffic from the end user would be routed through the MS backbone network from the POP of FrontDoor. This becomes the preferred design for customers that require very high network security and cannot afford to expose the stamp endpoints to the internet directly
+4. **Note:** 
+     - The support for Azure FrontDoor privately connecting to an Azure Application Gateway is still not supported. So a trade off has to be made between the requirements of having the private connectivity to the endpoint and the multitude of uses of a regional L7 LB.
+     - If this design decision is to be taken, the web application firewall can be placed in the FrontDoor so that the security scanning of the traffic would be done by the FrontDoor instance handling the traffic. Also the FrontDoor can compensate for the unavailability of the regional L7 LB for the path based routing by routing the traffic to the origin group based on the path. 
+     - **Reference:** https://learn.microsoft.com/en-us/azure/frontdoor/front-door-route-matching?pivots=front-door-standard-premium#structure-of-a-front-door-route-configuration
+     - 
+
+
+
+
+ 
 
