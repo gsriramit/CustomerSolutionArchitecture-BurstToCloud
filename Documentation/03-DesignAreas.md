@@ -152,18 +152,21 @@ The reasons for the design decision have been discussed below. This solution how
 3. **Note:** If the stamps are made independent, the asynchronous replication between the master/primary and secondary replica(s) in the secondary regions would happen over the MS backbone network and would not require the peering between the globalally separate networks  
 
 #### Private Endpoints and Private DNS zones
-The SQL server is each of the regions will be exposed only for private connections through Private Endpoints. The application running in the vmss will be using the private endpoints to connect to the SQL server and the database. 
-The sample application in this solution does not use the Azure KeyVault to save and read the secrets and certificates. However, in the case of production grade implementations that use the keyvault, the same is exposes to the application only through private endpoints. KeyVault in this case is deployed as a regional resource, i.e. One per region that can be shared by all the stamps in the region (if more than one stamp needs to be brough up per region). The architecture diagram shows the keyvault as a resource scoped to the stamp for purposes of brevity.
+1. The SQL server is each of the regions will be exposed only for private connections through Private Endpoints. The application running in the vmss will be using the private endpoints to connect to the SQL server and the database. 
+2. The sample application in this solution does not use the Azure KeyVault to save and read the secrets and certificates. However, in the case of production grade implementations that use the keyvault, the same is exposes to the application only through private endpoints. KeyVault in this case is deployed as a regional resource, i.e. One per region that can be shared by all the stamps in the region (if more than one stamp needs to be brough up per region). The architecture diagram shows the keyvault as a resource scoped to the stamp for purposes of brevity.
 
-Private DNS zones 
-The DNS zone for Azure SQLDB (database.windows.net) will be deployed as a centralized resource in the global workload resource group. Private endpoint A records for the logical SQL servers from each of the regions would be added to the same DNS zone group. When the applications need to resolve the FQDN of the SQL server, they resolve the same by looking up the A records in the common Private DNS zone.  
-**Note:** Even though a default requirement, it is worth a mention - the Virtual Network in every region should have the VNET link to the Private DNS zone so as be able to forward the address resolution requests accordingly. 
-**Important Read:** 
-There is a highly informative whitepaper that Adam Stuart has published on the design  criteria and approach for multi-region private DNS. The white paper can be read here - https://github.com/adstuart/azure-privatelink-multiregion   
-When using Azure SQL Fail-over Groups as the mechanism for BCDR in a 2-region setup and with a single global Private DNS zone acting as the source of truth, the key takeaways are 
-As mentioned in the previous section, the workload machines in the secondary region would resolve to the private IP of the SQL server in the first region when resolving the FQDN of the fail-over group. The traffic would then use the global VNET peering to send the requests to the primary region. This has been highlighted as a sub-optimal behavior associated with this design
-When the fail-over happens to the secondary region, the FOG FQDN during the first step of the resolution would point to the FQDN of the SQL sever in the secondary region. This is by design of the fail-over group that it needs to maintain the information of the sever that serves as the master at any given point in time. 
-After the FQDN of the secondary region's server is received, the same is resolved by doing a lookup in the global single private DNS zone
+**Private DNS zones** 
+1. The DNS zone for Azure SQLDB (database.windows.net) will be deployed as a centralized resource in the global workload resource group. Private endpoint A records for the logical SQL servers from each of the regions would be added to the same DNS zone group. When the applications need to resolve the FQDN of the SQL server, they resolve the same by looking up the A records in the common Private DNS zone.  
+2. **Note:** Even though a default requirement, it is worth a mention - the Virtual Network in every region should have the VNET link to the Private DNS zone so as be able to forward the address resolution requests accordingly. 
+3. **Important Read:** 
+     - There is a highly informative whitepaper that Adam Stuart has published on the design  criteria and approach for multi-region private DNS. The white paper can be read here - https://github.com/adstuart/azure-privatelink-multiregion   
+     - When using Azure SQL Fail-over Groups as the mechanism for BCDR in a 2-region setup and with a single global Private DNS zone acting as the source of truth, the key takeaways are 
+       - As mentioned in the previous section, the workload machines in the secondary region would resolve to the private IP of the SQL server in the first region when resolving the FQDN of the fail-over group. The traffic would then use the global VNET peering to send the requests to the primary region. This has been highlighted as a sub-optimal behavior associated with this design
+       - When the fail-over happens to the secondary region, the FOG FQDN during the first step of the resolution would point to the FQDN of the SQL sever in the secondary region. This is by design of the fail-over group that it needs to maintain the information of the sever that serves as the master at any given point in time. 
+       - After the FQDN of the secondary region's server is received, the same is resolved by doing a lookup in the global single private DNS zone  
+
+![image](https://user-images.githubusercontent.com/13979783/236746024-72ece89c-ffec-4661-90a4-544ab2946e83.png)
+**src**:https://www.youtube.com/watch?v=weZ-SPO-tIc&ab_channel=AdamStuart
 
 
 
