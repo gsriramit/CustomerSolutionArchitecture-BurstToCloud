@@ -23,9 +23,9 @@ The *Design Areas/Design Principles* page captures the *Availability SLO* of the
 
 ### 2. Design Principles and Design Areas
 1. Design Principles - Microsoft's Well-Architected Framework (WAF) provides a prescriptive guidance to design & architect workloads on the cloud based on a set of proven best-practices . The Framework has guidance for design spanning across 5 major pillars i.e., Security, Reliability, Cost-Optimization, Operational Excellence and Performance Optimization. In this exercise, we will elaborate on the though-process that has gone into designing the solution based on the Well-Architected Framework  
-[Reference to Design Principles]()
+[Reference to Design Principles](/Documentation/02-DesignPrinciples.md)
 2. Design Areas - This section aims to capture the design decisions that have been taken to achieve the Business requirements while adhering to the Design Principles and Mission Critical standards  
-[Reference to Design Areas]()
+[Reference to Design Areas](/Documentation/03-DesignAreas.md)
 
 ### 3. Mission Critical Baseline Architecture With Network Controls
 The provided templates aim at deploying an application following the Mission-Critical baseline architecture with Network Controls. We also explain in the subsequent sections the areas in which the implementation differs from the baseline to address the customer requirements.  
