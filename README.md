@@ -25,11 +25,6 @@ The solution that has been implemented to demonstrate cloud bursting is a form o
       - When the load reduces, the autoscale rule should be able to scale the instances back in. This will stop when the metric is well within the limits of what can be handled by the on-premise infrastructure
 - Azure load testing tool needs to be used to exercise this scenario. Load pattern needs to be set in such a way that the burst happens to the cloud, continues to scale the scale-set beyond the first iteration and then slowly drop. At the end of the test, the traffic should be maintained at 80-90% of the Peak that on-premise can handle
 
-## Architecture Diagram
-
-![HighAvailability-BurstToCloud-Architecture-A](https://user-images.githubusercontent.com/13979783/236836546-2c6e2463-4c2e-4277-89a8-8a0198b88def.png)
-
-
 ## Documentation Guide
 The documentation of the solution will follow the pattern of the Microsoft Mission-Critical Workloads. Although the solution varies from the Mission Critical workloads in so many aspects, the Design sections will carry all the necessary information.  
 1. Design Methodology - [Design Methodology](/Documentation/01-DesignMethodology.md)
