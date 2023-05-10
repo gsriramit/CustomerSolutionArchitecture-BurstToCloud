@@ -2,7 +2,8 @@
 
 ## Architecture
 
-![HighAvailability-BurstToCloud-Architecture-A](https://user-images.githubusercontent.com/13979783/236836546-2c6e2463-4c2e-4277-89a8-8a0198b88def.png)
+![High Availability - BurstToCloud](https://github.com/gsriramit/CustomerSolutionArchitecture-BurstToCloud/assets/13979783/e86de91b-cc52-47ff-bc2b-99404482353d)
+
 
 ## Global Resources
 **1.Azure Traffic Manager-** The Traffic Manager serves as the global DNS load balancer. Since the traffic manager does not sit in the data path of the end user traffic, the endpoints load balanced by the Traffic manager should be public endpoints. This topic has been discussed in a great detail in the Networking Design Areas page   
@@ -31,5 +32,25 @@
 2. The regional observability resources i.e. Log Analytics workspace and Application Insights have also not been made private using AMPLS (Azure monitor private link service). If this is being done, then there needs to be a addresses in the private endpoint subnet for these resources too.
 
 ### Regional Observability Resources
-**Application Insights-** The app insights resources in the primary region that represents on-premise will capture the application logs and metrices. Even if this solution is implemented in a proper hybrid environment, it is advisable to have an Azure App insights resources that runs on Azure in the same region as that of the on-premise stamp.The application should be configured to send the logs and metrics to insights sink. One of the Azure monitor autoscale rules is based on the metrics read from the primary instance of App Insights. The Logic app that adjusts the weights of the Traffic Manager is also based on the alerts triggered from the primary instance of insights. 
+**Application Insights-** The app insights resources in the primary region that represents on-premise will capture the application logs and metrices. Even if this solution is implemented in a proper hybrid environment, it is *advisable to have an Azure App insights resources that runs on Azure in the same region as that of the on-premise stamp*.The application should be configured to send the logs and metrics to insights sink. One of the Azure monitor autoscale rules that gets triggered during the first burst is based on the metrics read from the primary instance of App Insights. The Logic app that adjusts the weights of the Traffic Manager is also based on the alerts triggered from the primary instance of insights.  
+The Insights instance in the secondary azure region will be configured to receive app logs and metrics from the apps in the secondary Azure region. We have not implemented the subsequent cases of scale out in the secondary region but one or more Autoscale rules (**for scaleout to handle the traffic growth beyond the initial burst to cloud**) and Logic app to further adjust the traffic manager weights should be based on this instance of app insights  
+**Log Analytics Workspace-** The Log analytics workspace will be configured as the primary sink for all the infrastructure and diagnostics logs received from the regional resources
+
+## Data Flow
+
+![High Availability - BurstToCloud-FlowDiagram](https://github.com/gsriramit/CustomerSolutionArchitecture-BurstToCloud/assets/13979783/19ce16ce-0048-4679-b404-6a9a53ef0138)
+
+
+1. The Traffic manager initially has 99 and 1 as the weights assigned to the on-premise and Azure endpoints. The Azure endpoint would be disabled to begin with. The end user traffic would be sent to the on-premise/primary endpoint i.e., the Azure External Load Balancer in this case
+2. Azure Load balancer routes the traffic to one of the healthy vmss instances in its backend pool
+3. The application then connects to the data platform (Azure SQLDB) through its private endpoint and completes the data access operations
+   - **Note:** The return traffic flow has been skipped for brevity
+4. Azure monitor autoscale has been configured to scale out the VMSS instances in the secondary region (that is on warm standby with just one running instance). Application insights metrics would trigger the autoscale rule according to the config (e.g. Request rate > 5000/second)
+   - 4.1 Auto scale rule scales out VMSS by 2 instances 
+5. When the traffic further increases (to the configured value of 90% of on-premises' threshold), the alert from the primary app insights instance gets executed
+   - 5.1 The action group for the alert executes the logic app flow. The logic app now changes the weights of the Traffic manager (to say 84:16) and also enables the Azure/secondary endpoint
+6. Now 16%  of client's traffic would be sent to the Azure endpoint, i.e., the Azure public LB 
+7. The load balancer would route the traffic to backend vmss instances
+8. The app would now send all the read traffic to geo read-replica in the secondary region and the write traffic to the primary replica in the primary region. The connections to these replicas happen through the corresponding regional private endpoints
+
 
