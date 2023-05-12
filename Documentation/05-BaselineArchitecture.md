@@ -2,7 +2,7 @@
 
 ## Architecture
 
-![High Availability - BurstToCloud](https://github.com/gsriramit/CustomerSolutionArchitecture-BurstToCloud/assets/13979783/e86de91b-cc52-47ff-bc2b-99404482353d)
+![High Availability - BurstToCloud](https://github.com/gsriramit/CustomerSolutionArchitecture-BurstToCloud/assets/13979783/58cafd1b-de51-4a5b-9032-4618c89970ea)
 
 
 ## Global Resources
