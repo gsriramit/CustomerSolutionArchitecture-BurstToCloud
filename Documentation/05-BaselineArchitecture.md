@@ -38,31 +38,36 @@ The Insights instance in the secondary azure region will be configured to receiv
 
 ## Data Flow
 
-![High Availability - BurstToCloud-FlowDiagram](https://github.com/gsriramit/CustomerSolutionArchitecture-BurstToCloud/assets/13979783/19ce16ce-0048-4679-b404-6a9a53ef0138)
+![High Availability - BurstToCloud-FlowDiagram](https://github.com/gsriramit/CustomerSolutionArchitecture-BurstToCloud/assets/13979783/be68d841-0508-4993-99af-804bd1722618)
+
 
 
 1. The Traffic manager initially has 99 and 1 as the weights assigned to the on-premise and Azure endpoints. The Azure endpoint would be disabled to begin with. The end user traffic would be sent to the on-premise/primary endpoint i.e., the Azure External Load Balancer in this case  
-![Screenshot 2023-04-12 220134](https://github.com/gsriramit/CustomerSolutionArchitecture-BurstToCloud/assets/13979783/a801d882-4b1d-41e7-98ce-ddc84bf844aa)
+
+![Screenshot 2023-04-12 220134](https://github.com/gsriramit/CustomerSolutionArchitecture-BurstToCloud/assets/13979783/5e7e6aff-dcd1-49c0-ba22-6c4cdb494698)
+
 
 2. Azure Load balancer routes the traffic to one of the healthy vmss instances in its backend pool
 3. The application then connects to the data platform (Azure SQLDB) through its private endpoint and completes the data access operations
    - **Note:** The return traffic flow has been skipped for brevity
 4. Azure monitor autoscale has been configured to scale out the VMSS instances in the secondary region (that is on warm standby with just one running instance). Application insights metrics would trigger the autoscale rule according to the config (e.g. Request rate > 5000/second)
    - 4.1 Auto scale rule scales out VMSS by 2 instances  
-![Screenshot 2023-04-12 215446](https://github.com/gsriramit/CustomerSolutionArchitecture-BurstToCloud/assets/13979783/b51a6383-a5ec-4f77-92e0-28ce3a6d19e1)
+![Screenshot 2023-04-12 215446](https://github.com/gsriramit/CustomerSolutionArchitecture-BurstToCloud/assets/13979783/f8f1e7fb-f823-4394-9648-27711ced9840)
 
 5. When the traffic further increases (to the configured value of 90% of on-premises' threshold), the alert from the primary app insights instance gets executed
    - 5.1 The action group for the alert executes the logic app flow. The logic app now changes the weights of the Traffic manager (to say 84:16) and also enables the Azure/secondary endpoint  
-![Screenshot 2023-04-13 182614](https://github.com/gsriramit/CustomerSolutionArchitecture-BurstToCloud/assets/13979783/8bc8ba93-906f-4ea4-9b28-3d70228cb76e)  
+![Screenshot 2023-04-12 215331](https://github.com/gsriramit/CustomerSolutionArchitecture-BurstToCloud/assets/13979783/33b32da8-d4b4-41ff-8235-3e59dc6c6881)
 
-![Screenshot 2023-04-12 215331](https://github.com/gsriramit/CustomerSolutionArchitecture-BurstToCloud/assets/13979783/cad846ff-8f8c-4ece-9cb8-aee22a96f08d)
+![Screenshot 2023-04-13 182614](https://github.com/gsriramit/CustomerSolutionArchitecture-BurstToCloud/assets/13979783/9a5e9e37-732d-44b6-a298-aac980800e58)
+
 
 6. Now 16%  of client's traffic would be sent to the Azure endpoint, i.e., the Azure public LB 
 7. The load balancer would route the traffic to backend vmss instances
 8. The app would now send all the read traffic to geo read-replica in the secondary region and the write traffic to the primary replica in the primary region. The connections to these replicas happen through the corresponding regional private endpoints  
 
 **Note:** Once the rate of requests decreases to a level that the on-premises can alone handle, the operations elaborated in the steps above happen in reverse. The autoscale rule would execute the scale in operation to bring down the Azure VMSS back to warm standby state of 1 instance. The logic app workflow would revert the weights back to 99 and 1 so that the Azure endpoint does not have to handle any active traffic  
-![Screenshot 2023-04-12 220109](https://github.com/gsriramit/CustomerSolutionArchitecture-BurstToCloud/assets/13979783/84a01380-7737-49a2-99fa-52a9e14fa7ae)
+![Screenshot 2023-04-12 220109](https://github.com/gsriramit/CustomerSolutionArchitecture-BurstToCloud/assets/13979783/319ce220-511a-487a-a3e2-fc0b8b36992c)
+
 
 
 
